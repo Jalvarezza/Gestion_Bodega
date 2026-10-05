@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- G: arco desde 1 en punto, rodea hacia la izquierda hasta las 3, luego barra horizontal hacia adentro -->
+  <path
+    d="M 66,22 A 32,32 0 1,0 82,50 L 54,50"
+    fill="none"
+    stroke="#00AEEF"
+    stroke-width="13"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
