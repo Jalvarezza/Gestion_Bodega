@@ -1217,11 +1217,38 @@ label {
   display: flex; align-items: flex-start;
   justify-content: space-between; flex-wrap: wrap; gap: 10px;
 }
-.tc-header-left { display: flex; flex-direction: column; gap: 8px; }
-.tc-header-title-row { display: flex; align-items: center; gap: 8px; }
-.tc-header-ico { width: 20px; height: 20px; color: var(--accent); display: flex; align-items: center; }
-.tc-header-ico svg { width: 20px; height: 20px; }
-.tc-titulo { font-size: 1.2rem; font-weight: 800; color: var(--text-primary); margin: 0; }
+.tc-bienvenida { display: flex; flex-direction: column; gap: 4px; margin: 0; min-width: 0; }
+.tc-bienvenida-saludo {
+  font-size: .8rem; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.tc-bienvenida-nombre {
+  position: relative; width: fit-content; max-width: 100%;
+  padding-bottom: 10px;
+  font-size: 2.25rem; font-weight: 800; line-height: 1.1; letter-spacing: -.02em;
+  overflow-wrap: anywhere;
+  background-image: linear-gradient(90deg, var(--accent) 0%, #7dd3fc 50%, var(--accent) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text;
+  color: transparent;
+  animation: tc-nombre-brillo 6s linear infinite;
+}
+.tc-bienvenida-nombre::after {
+  content: "";
+  position: absolute; left: 0; bottom: 0;
+  width: 56px; height: 4px; border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+  animation: tc-nombre-subrayado .9s ease-out both;
+}
+:root[data-theme="light"] .tc-bienvenida-nombre {
+  background-image: linear-gradient(90deg, #005F8A 0%, #0080B8 50%, #005F8A 100%);
+}
+@keyframes tc-nombre-brillo { to { background-position: 200% center; } }
+@keyframes tc-nombre-subrayado { from { width: 0; opacity: 0; } to { width: 56px; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .tc-bienvenida-nombre, .tc-bienvenida-nombre::after { animation: none; }
+}
 .tc-header-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .tc-badge-turno {
@@ -1258,18 +1285,6 @@ label {
   background: rgba(52,211,153,.15); color: #34d399;
   border: 1px solid rgba(52,211,153,.3);
   animation: tc-pulse 2s ease-in-out infinite;
-}
-
-/* Reloj */
-.tc-reloj {
-  font-size: 1.5rem; font-weight: 800;
-  color: var(--text-primary);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: .03em;
-  align-self: center;
-  background: rgba(148,163,184,.06);
-  padding: 6px 14px; border-radius: 10px;
-  border: 1px solid var(--border-light);
 }
 
 /* KPI row */
@@ -1407,8 +1422,7 @@ label {
   .tc-kpi-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .tc-kpi-card { padding: 12px 13px; gap: 10px; }
   .tc-kpi-valor { font-size: 1.3rem; }
-  .tc-titulo  { font-size: 1rem; }
-  .tc-reloj   { font-size: 1.1rem; padding: 5px 10px; }
+  .tc-bienvenida-nombre { font-size: 1.7rem; }
   .tc-equipo-fila { grid-template-columns: 18px 1fr 44px auto; }
   .tc-equipo-avance-pct { display: none; }
   .tc-header  { flex-direction: column; }

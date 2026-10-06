@@ -1,4 +1,3 @@
-import { useState, useEffect } from 'react'
 import { useDashboard, useEquipoBodega } from '../hooks/useDashboard'
 
 // ── Datos reales — flujo de trabajo ──────────────────────────────────────────
@@ -10,7 +9,6 @@ function IcoBox()    { return <svg viewBox="0 0 24 24" fill="none" stroke="curre
 function IcoClock()  { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> }
 function IcoTruck()  { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> }
 function IcoFlow()   { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="6" height="4" rx="1"/><rect x="9" y="3" width="6" height="4" rx="1"/><rect x="16" y="3" width="6" height="4" rx="1"/><path d="M5 7v4"/><path d="M12 7v4"/><path d="M19 7v4"/><rect x="2" y="11" width="6" height="4" rx="1"/><rect x="9" y="11" width="6" height="4" rx="1"/><rect x="16" y="11" width="6" height="4" rx="1"/></svg> }
-function IcoFactory(){ return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M2 20v-8l4-4 4 8 4-8 4 4v8H2z"/><line x1="2" y1="20" x2="22" y2="20"/></svg> }
 function IcoUsers()  { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> }
 
 // ── Barra de progreso ─────────────────────────────────────────────────────────
@@ -39,24 +37,10 @@ const ESTADO_OP_CFG = {
   inactivo: { label: 'Sin actividad',  color: '#94a3b8', dot: '#94a3b8' },
 } as const
 
-// ── Reloj en tiempo real ──────────────────────────────────────────────────────
-
-function RelojTurno() {
-  const [hora, setHora] = useState(() =>
-    new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-  )
-  useEffect(() => {
-    const id = setInterval(() => {
-      setHora(new Date().toLocaleTimeString('es-CL', { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
-    }, 1000)
-    return () => clearInterval(id)
-  }, [])
-  return <span className="tc-reloj">{hora}</span>
-}
-
 // ── Componente principal ──────────────────────────────────────────────────────
 
 export function DashboardOperador() {
+  const nombreUsuario                = localStorage.getItem('user_nombre') ?? ''
   const { data: kpis, isLoading }    = useDashboard()
   const { data: equipo, isLoading: equipoLoading } = useEquipoBodega()
 
@@ -81,13 +65,10 @@ export function DashboardOperador() {
 
       {/* ── Cabecera ────────────────────────────────────────────────────────── */}
       <div className="tc-header">
-        <div className="tc-header-left">
-          <div className="tc-header-title-row">
-            <span className="tc-header-ico"><IcoFactory /></span>
-            <h1 className="tc-titulo">Torre de Control — Producción Bodega</h1>
-          </div>
-        </div>
-        <RelojTurno />
+        <h1 className="tc-bienvenida">
+          <span className="tc-bienvenida-saludo">Bienvenido</span>
+          <span className="tc-bienvenida-nombre">{nombreUsuario}</span>
+        </h1>
       </div>
 
       {/* ── KPIs producción ─────────────────────────────────────────────────── */}
