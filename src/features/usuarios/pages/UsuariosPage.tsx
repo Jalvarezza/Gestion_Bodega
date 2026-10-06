@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../shared/utils/apiClient'
 
-type Usuario = { id: string; nombre: string; email: string; rol: string }
+type Usuario = { id: string; nombre: string; email: string; rol: string; bloqueado: boolean }
 type Rol = 'admin' | 'supervisor' | 'validador' | 'operador'
 
 const ROL_LABELS: Record<Rol, string> = {
@@ -28,12 +28,16 @@ function useUsuarios() {
 
 export function UsuariosPage() {
   const qc = useQueryClient()
+  const miId = localStorage.getItem('user_id') ?? ''
   const { data: usuarios = [], isLoading, isError } = useUsuarios()
 
   const [modalCrear, setModalCrear]       = useState(false)
   const [modalPassword, setModalPassword] = useState<Usuario | null>(null)
   const [modalRol, setModalRol]           = useState<Usuario | null>(null)
   const [modalEliminar, setModalEliminar] = useState<Usuario | null>(null)
+  const [modalBloquear, setModalBloquear] = useState<Usuario | null>(null)
+  const [errorEliminar, setErrorEliminar] = useState<string | null>(null)
+  const [errorBloquear, setErrorBloquear] = useState<string | null>(null)
 
   // Formulario crear
   const [nombre, setNombre]     = useState('')
@@ -65,6 +69,10 @@ export function UsuariosPage() {
   const eliminar = useMutation({
     mutationFn: (body: object) => apiClient.post('/usuarios?accion=eliminar', body),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['usuarios'] }); setModalEliminar(null) },
+  })
+  const bloquear = useMutation({
+    mutationFn: (body: object) => apiClient.post('/usuarios?accion=bloquear', body),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['usuarios'] }); setModalBloquear(null) },
   })
 
   function resetCrear() {
@@ -103,9 +111,22 @@ export function UsuariosPage() {
 
   async function handleEliminar() {
     if (!modalEliminar) return
+    setErrorEliminar(null)
     try {
       await eliminar.mutateAsync({ id: modalEliminar.id })
-    } catch {}
+    } catch (e: any) {
+      setErrorEliminar(e?.message ?? 'Error al eliminar usuario')
+    }
+  }
+
+  async function handleBloquear() {
+    if (!modalBloquear) return
+    setErrorBloquear(null)
+    try {
+      await bloquear.mutateAsync({ id: modalBloquear.id, bloqueado: !modalBloquear.bloqueado })
+    } catch (e: any) {
+      setErrorBloquear(e?.message ?? 'Error al cambiar el bloqueo')
+    }
   }
 
   const MODAL_STYLE: React.CSSProperties = {
@@ -131,40 +152,62 @@ export function UsuariosPage() {
 
       {!isLoading && !isError && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginTop: '1rem' }}>
-          {usuarios.map((u) => (
+          {usuarios.map((u) => {
+            const esYo = u.id === miId
+            return (
             <div key={u.id} style={{
-              display: 'flex', alignItems: 'center', gap: '1rem',
+              display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
               padding: '1.1rem 1.4rem',
               background: 'var(--bg-card)',
               border: '1px solid var(--border)',
               borderRadius: '16px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.18)',
+              opacity: u.bloqueado ? 0.65 : 1,
             }}>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)' }}>{u.nombre}</div>
+              <div style={{ flex: 1, minWidth: 180 }}>
+                <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {u.nombre}
+                  {esYo && (
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: 'var(--bg-elevated)', color: 'var(--text-secondary)' }}>Tú</span>
+                  )}
+                  {u.bloqueado && (
+                    <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: 'rgba(239,68,68,0.15)', color: 'var(--danger)' }}>Bloqueado</span>
+                  )}
+                </div>
                 <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 3 }}>{u.email}</div>
               </div>
               <span style={{ fontSize: '0.78rem', fontWeight: 700, padding: '5px 14px', borderRadius: '999px', background: `${ROL_COLORS[u.rol as Rol]}22`, color: ROL_COLORS[u.rol as Rol] ?? 'var(--text-secondary)', whiteSpace: 'nowrap' }}>
                 {ROL_LABELS[u.rol as Rol] ?? u.rol}
               </span>
-              <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
-                <button
-                  className="btn-secundario"
-                  style={{ fontSize: '0.8rem', padding: '6px 14px', borderRadius: '10px' }}
-                  onClick={() => { setModalRol(u); setNuevoRol(u.rol as Rol) }}
-                >Rol</button>
+              <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0, flexWrap: 'wrap' }}>
+                {!esYo && (
+                  <button
+                    className="btn-secundario"
+                    style={{ fontSize: '0.8rem', padding: '6px 14px', borderRadius: '10px' }}
+                    onClick={() => { setModalRol(u); setNuevoRol(u.rol as Rol); setErrorRol(null) }}
+                  >Rol</button>
+                )}
                 <button
                   className="btn-secundario"
                   style={{ fontSize: '0.8rem', padding: '6px 14px', borderRadius: '10px' }}
                   onClick={() => { setModalPassword(u); setNewPassword(''); setErrorPwd(null) }}
                 >Contraseña</button>
-                <button
-                  style={{ fontSize: '0.8rem', padding: '6px 14px', background: 'rgba(239,68,68,0.12)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', cursor: 'pointer', fontWeight: 600 }}
-                  onClick={() => setModalEliminar(u)}
-                >Eliminar</button>
+                {!esYo && (
+                  <button
+                    style={{ fontSize: '0.8rem', padding: '6px 14px', background: 'rgba(245,158,11,0.12)', color: '#f59e0b', border: '1px solid rgba(245,158,11,0.35)', borderRadius: '10px', cursor: 'pointer', fontWeight: 600 }}
+                    onClick={() => { setModalBloquear(u); setErrorBloquear(null) }}
+                  >{u.bloqueado ? 'Desbloquear' : 'Bloquear'}</button>
+                )}
+                {!esYo && (
+                  <button
+                    style={{ fontSize: '0.8rem', padding: '6px 14px', background: 'rgba(239,68,68,0.12)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: '10px', cursor: 'pointer', fontWeight: 600 }}
+                    onClick={() => { setModalEliminar(u); setErrorEliminar(null) }}
+                  >Eliminar</button>
+                )}
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       )}
 
@@ -257,6 +300,7 @@ export function UsuariosPage() {
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
               ¿Eliminar a <strong style={{ color: 'var(--text-primary)' }}>{modalEliminar.nombre}</strong>? Esta acción no se puede deshacer.
             </p>
+            {errorEliminar && <p className="pm-confirmar-barcode-error">{errorEliminar}</p>}
             <div className="pm-confirmar-acciones">
               <button className="btn-secundario pm-confirmar-btn" onClick={() => setModalEliminar(null)}>Cancelar</button>
               <button
@@ -265,6 +309,27 @@ export function UsuariosPage() {
                 onClick={handleEliminar}
               >
                 {eliminar.isPending ? 'Eliminando…' : 'Sí, eliminar'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal confirmar bloqueo / desbloqueo */}
+      {modalBloquear && (
+        <div style={MODAL_STYLE} onClick={() => setModalBloquear(null)}>
+          <div style={BOX_STYLE} onClick={(e) => e.stopPropagation()}>
+            <h3 className="modal-titulo">{modalBloquear.bloqueado ? 'Desbloquear usuario' : 'Bloquear usuario'}</h3>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
+              {modalBloquear.bloqueado
+                ? <>¿Desbloquear a <strong style={{ color: 'var(--text-primary)' }}>{modalBloquear.nombre}</strong>? Podrá volver a iniciar sesión.</>
+                : <>¿Bloquear a <strong style={{ color: 'var(--text-primary)' }}>{modalBloquear.nombre}</strong>? No podrá iniciar sesión hasta que lo desbloquees. Su historial se conserva.</>}
+            </p>
+            {errorBloquear && <p className="pm-confirmar-barcode-error">{errorBloquear}</p>}
+            <div className="pm-confirmar-acciones">
+              <button className="btn-secundario pm-confirmar-btn" onClick={() => setModalBloquear(null)}>Cancelar</button>
+              <button className="btn-primario pm-confirmar-btn" disabled={bloquear.isPending} onClick={handleBloquear}>
+                {bloquear.isPending ? 'Guardando…' : modalBloquear.bloqueado ? 'Sí, desbloquear' : 'Sí, bloquear'}
               </button>
             </div>
           </div>

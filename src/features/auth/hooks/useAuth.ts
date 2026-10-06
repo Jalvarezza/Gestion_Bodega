@@ -37,7 +37,10 @@ export function useAuth() {
     // Paso 1: autenticar con Supabase Auth
     const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password })
 
-    // Paso 2: credenciales incorrectas
+    // Paso 2: usuario bloqueado por el admin o credenciales incorrectas
+    if (error?.code === 'user_banned') {
+      return { ok: false, mensaje: 'Tu usuario está bloqueado. Contacta al administrador.' }
+    }
     if (error || !data.session) {
       return { ok: false, mensaje: 'Credenciales incorrectas. Verifica tu email y contraseña.' }
     }
@@ -57,6 +60,9 @@ export function useAuth() {
 
     if (!response.ok) {
       await supabaseClient.auth.signOut()
+      if (response.status === 403) {
+        return { ok: false, mensaje: 'Tu usuario está bloqueado. Contacta al administrador.' }
+      }
       return { ok: false, mensaje: 'Usuario no configurado en el sistema. Contacta al administrador.' }
     }
 

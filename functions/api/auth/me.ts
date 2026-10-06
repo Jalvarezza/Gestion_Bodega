@@ -11,6 +11,9 @@ export async function onRequest({ request, env }: { request: Request; env: Env }
 
   const { data: { user }, error } = await supabase.auth.getUser(token)
   if (error || !user) return json({ error: 'Token inválido' }, 401)
+  if (user.banned_until && new Date(user.banned_until).getTime() > Date.now()) {
+    return json({ error: 'Usuario bloqueado' }, 403)
+  }
 
   const { data: usuario } = await supabase
     .from('usuarios')

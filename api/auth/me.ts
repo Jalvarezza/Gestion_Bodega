@@ -12,6 +12,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { data: { user }, error } = await supabase.auth.getUser(token)
   console.log('USER:', user?.id, '| AUTH ERROR:', error?.message)
   if (error || !user) return res.status(401).json({ error: 'Token inválido' })
+  if (user.banned_until && new Date(user.banned_until).getTime() > Date.now()) {
+    return res.status(403).json({ error: 'Usuario bloqueado' })
+  }
 
   const { data: usuario, error: errorUsuario } = await supabase
     .from('usuarios')
