@@ -163,7 +163,10 @@ export async function parsearNota(file: File): Promise<ResultadoParseoNota> {
 
     // Descripción: entre xDesc y xPrecio (excluye columnas de precio)
     const descItems = fila.filter((it) => it.x >= xDesc - MARGEN && it.x < xPrecio - MARGEN)
-    const descripcion = descItems.map((it) => it.str).join(' ').trim() || codigoProducto
+    const descripcion = descItems.map((it) => it.str).join(' ').trim()
+    // Las filas de totales del pie (ej. neto "25,935." + IVA "19") caen en las
+    // columnas Cantidad/Código pero nunca traen descripción.
+    if (!descripcion) continue
 
     const clave = `${codigoProducto}-${cantidad}`
     if (vistos.has(clave)) continue
