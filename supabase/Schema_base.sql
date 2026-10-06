@@ -1,11 +1,3 @@
--- Esquema base del WMS Grantt, reconstruido desde las consultas del código.
--- Debe ejecutarse ANTES que el resto de migraciones (20260824_* en adelante),
--- que hacen ALTER sobre estas tablas.
---
--- Los nombres de FK que el código usa como hint de PostgREST
--- (ej. nota_productos_producto_equivalente_id_fkey) son los nombres por
--- defecto de Postgres para un REFERENCES inline: no renombrar.
-
 BEGIN;
 
 -- ═══════════════════════════════════════════════════════════════════════════
@@ -85,6 +77,7 @@ CREATE TABLE productos (
   descripcion_grupo         text,
   codigo_subgrupo           text,
   descripcion_subgrupo      text,
+  desc_2                    text,
   alto_cm                   numeric,
   ancho_cm                  numeric,
   largo_cm                  numeric,
@@ -134,7 +127,7 @@ CREATE INDEX idx_importacion_detalles_importacion ON importacion_detalles(import
 --  Lotes de inventario (stock físico, FIFO por fecha_ingreso)
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- created_at lo usan notas e inventario-inicial; creado_en lo usa olas.
+-- created_at lo usa notas; creado_en lo usa olas.
 CREATE TABLE lotes_inventario (
   id                      uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   producto_id             uuid        NOT NULL REFERENCES productos(id),
@@ -316,8 +309,8 @@ CREATE TABLE traslados (
 --  Movimientos (log append-only)
 -- ═══════════════════════════════════════════════════════════════════════════
 
--- lote_id sin FK: inventario-inicial borra lotes que ya tienen movimientos,
--- y un ON DELETE SET NULL chocaría con el trigger append-only.
+-- lote_id sin FK: borrar un lote con movimientos fallaría, y un
+-- ON DELETE SET NULL chocaría con el trigger append-only.
 CREATE TABLE movimientos (
   id              uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
   tipo            text        NOT NULL,

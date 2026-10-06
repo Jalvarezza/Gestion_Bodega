@@ -13,7 +13,6 @@ import { NotasPage }        from './features/notas/pages/NotasPage'
 import { NotaDetallePage }  from './features/notas/pages/NotaDetallePage'
 import { SalidasPage }      from './features/salidas/pages/SalidasPage'
 import { HistorialPage }    from './features/historial/pages/HistorialPage'
-import { InventarioInicialPage }  from './features/inventario-inicial/pages/InventarioInicialPage'
 import { UsuariosPage }          from './features/usuarios/pages/UsuariosPage'
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -44,7 +43,6 @@ export default function App() {
 
       {/* Solo Admin */}
       <Route path="/salidas"    element={<Protected><SalidasPage /></Protected>} />
-      <Route path="/inventario-inicial" element={<Protected><InventarioInicialPage /></Protected>} />
 
       {/* Gestión de usuarios — solo admin */}
       <Route path="/usuarios" element={<Protected><UsuariosPage /></Protected>} />
