@@ -26,9 +26,6 @@ mkcert.exe
 .next/
 out/
 
-# Vercel
-.vercel/
-
 # Supabase CLI
 supabase/.temp/
 

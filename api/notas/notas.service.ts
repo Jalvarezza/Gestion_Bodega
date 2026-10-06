@@ -160,7 +160,7 @@ const PREFIJOS_EQUIVALENTES = ['HX', 'EK', 'BOL', 'BO', 'GT', 'BK'] as const
 
 //Helpers
 
-// Cache en memoria: los workers de Cloudflare reutilizan instancias entre requests,
+// Cache en memoria: el servidor de Next reutiliza el proceso entre requests,
 // así que este Map persiste y evita una query a BD por cada operación admin (M6).
 const _adminCache = new Map<string, { esAdmin: boolean; expiresAt: number }>()
 

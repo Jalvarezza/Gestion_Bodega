@@ -9,7 +9,7 @@
     "dev": "concurrently --kill-others --kill-others-on-fail --names \"next,vite\" --prefix-colors \"blue,green\" \"next dev -p 3001\" \"vite\"",
     "dev:vite": "vite",
     "dev:next": "next dev -p 3001",
-    "build": "tsc -b && vite build && cp dist/index.html dist/404.html",
+    "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

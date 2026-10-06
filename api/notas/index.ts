@@ -45,6 +45,11 @@ const cambiarEstadoSchema = z.object({
   nombreChofer: z.string().min(1),
 })
 
+const enviarRevisionSchema = z.object({
+  adminId: z.string().uuid(),
+  notaId:  z.string().uuid(),
+})
+
 const anularNotaSchema = z.object({
   adminId: z.string().uuid(),
   notaId:  z.string().uuid(),
@@ -121,6 +126,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: parsed.error.message } })
       }
       const result = await notasService.concluirParcial(parsed.data)
+      if (!result.ok) return res.status(400).json({ error: result.error })
+      return res.status(200).json(result.data)
+    }
+
+    if (accion === 'enviar-revision') {
+      const parsed = enviarRevisionSchema.safeParse(req.body)
+      if (!parsed.success) {
+        return res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: parsed.error.message } })
+      }
+      const result = await notasService.enviarARevision(parsed.data)
       if (!result.ok) return res.status(400).json({ error: result.error })
       return res.status(200).json(result.data)
     }
