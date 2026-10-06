@@ -51,3 +51,5 @@ supabase/.temp/
 
 # OS
 Thumbs.db
+
+.claude/

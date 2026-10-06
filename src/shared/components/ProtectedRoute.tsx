@@ -3,9 +3,9 @@ import { Navigate } from 'react-router-dom'
 import type { UserRole } from '../types/base'
 
 // Rutas que solo puede ver admin
-const RUTAS_SOLO_ADMIN = ['/ingresos', '/etiquetas', '/usuarios']
+const RUTAS_SOLO_ADMIN = ['/usuarios']
 // Rutas que puede ver admin + supervisor (no operador)
-const RUTAS_ADMIN_SUPERVISOR = ['/salidas', '/picking-masivo', '/historial', '/inventario-inicial']
+const RUTAS_ADMIN_SUPERVISOR = ['/salidas', '/historial', '/inventario-inicial']
 
 interface Props {
   children:   React.ReactNode
@@ -64,21 +64,18 @@ export function ProtectedRoute({ children, rutaActual }: Props) {
   }
 
   // Operador intenta ruta de admin o admin+supervisor → /productos
-  // Excepción: /picking-masivo/operador es la ruta propia del operador
   if (rol === 'operador') {
-    const esRutaOperadorPM = rutaActual.startsWith('/picking-masivo/operador')
-    const esRutaOla        = rutaActual.startsWith('/picking-masivo/ola/')
-    const bloqueada = !esRutaOperadorPM && !esRutaOla && (
+    const bloqueada = (
       RUTAS_SOLO_ADMIN.some((r) => rutaActual.startsWith(r))
       || RUTAS_ADMIN_SUPERVISOR.some((r) => rutaActual.startsWith(r))
     )
     if (bloqueada) return <Navigate to="/productos" replace />
   }
 
-  // Supervisor intenta ruta solo-admin → /picking-masivo
+  // Supervisor intenta ruta solo-admin → /home
   if (rol === 'supervisor') {
     const bloqueada = RUTAS_SOLO_ADMIN.some((r) => rutaActual.startsWith(r))
-    if (bloqueada) return <Navigate to="/picking-masivo" replace />
+    if (bloqueada) return <Navigate to="/home" replace />
   }
 
   return <>{children}</>

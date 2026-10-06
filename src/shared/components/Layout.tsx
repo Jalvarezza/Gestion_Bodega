@@ -29,14 +29,10 @@ type NavItem = {
 // ── iconos SVG reutilizables ──────────────────────────────────────────────
 const IcoSearch   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
 const IcoMap      = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><rect x="2" y="10" width="20" height="5" rx="1"/><rect x="2" y="17" width="20" height="5" rx="1"/></svg>
-const IcoImport   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="12" y2="18"/><line x1="15" y1="15" x2="12" y2="18"/></svg>
 const IcoNVPrep   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
 const IcoNVDesp   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
-const IcoTraslado = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M15 6l6 6-6 6"/><path d="M19 12H5"/><path d="M9 6L3 12l6 6"/></svg>
 const IcoHistoria = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 const IcoUbicacion= <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
-const IcoEtiqueta = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
-const IcoPicking  = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
 const IcoUsuarios = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
 const IcoDashboard= <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
 const IcoReporte  = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
@@ -44,11 +40,10 @@ const IcoReporte  = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 // ─────────────────────────────────────────────────────────────────────────────
 //  MATRIZ DE NAVEGACIÓN POR ROL
 //
-//  admin:      Dashboard BI, Busqueda, Mapa, Importación, NV Prep, NV Desp,
-//              Traslados, Historial, Ubicación Inicial, Etiquetas, Picking Masivo, Usuarios
-//  supervisor: Busqueda, NV Despacho, Historial, Mapa, Reporte Discrepancias,
-//              Ubicación, Picking Masivo
-//  operador:   Busqueda, Mapa, NV Preparación, Picking Masivo, Ubicación, Traslado
+//  admin:      Dashboard BI, Busqueda, Mapa, NV Prep, NV Desp, Historial,
+//              Ubicación Inicial, Usuarios
+//  supervisor: Dashboard BI, Busqueda, Mapa, NV Despacho, Historial, Ubicación
+//  operador:   Busqueda, Mapa, NV Preparación, Ubicación
 // ─────────────────────────────────────────────────────────────────────────────
 const NAV_ITEMS: NavItem[] = [
   // ── Solo Admin ───────────────────────────────────────────────────────────
@@ -65,11 +60,6 @@ const NAV_ITEMS: NavItem[] = [
     ruta: '/ubicaciones', label: 'Mapa Bodega', labelCorto: 'Mapa',
     icono: IcoMap,
   },
-  // ── Solo Admin ───────────────────────────────────────────────────────────
-  {
-    ruta: '/ingresos', label: 'Importacion', labelCorto: 'Importar', roles: ['admin'],
-    icono: IcoImport,
-  },
   // ── Admin + Operador ─────────────────────────────────────────────────────
   {
     ruta: '/notas', label: 'NV preparacion', labelCorto: 'NV prep', roles: ['admin', 'operador'],
@@ -80,11 +70,6 @@ const NAV_ITEMS: NavItem[] = [
     ruta: '/salidas', label: 'NV despacho', labelCorto: 'NV desp', roles: ['admin', 'supervisor'],
     icono: IcoNVDesp,
   },
-  // ── Admin + Operador ─────────────────────────────────────────────────────
-  {
-    ruta: '/traslados', label: 'Traslado', labelCorto: 'Traslado', roles: ['admin', 'operador'],
-    icono: IcoTraslado,
-  },
   // ── Admin + Supervisor ───────────────────────────────────────────────────
   {
     ruta: '/historial', label: 'Historial', labelCorto: 'Historial', roles: ['admin', 'supervisor'],
@@ -94,21 +79,6 @@ const NAV_ITEMS: NavItem[] = [
   {
     ruta: '/inventario-inicial', label: 'Ubicacion Inicial', labelCorto: 'Ubicación', roles: ['admin', 'supervisor', 'operador'],
     icono: IcoUbicacion,
-  },
-  // ── Solo Admin ───────────────────────────────────────────────────────────
-  {
-    ruta: '/etiquetas', label: 'Etiquetas', labelCorto: 'Etiquetas', roles: ['admin'],
-    icono: IcoEtiqueta,
-  },
-  // ── Admin + Supervisor: ruta principal picking masivo ────────────────────
-  {
-    ruta: '/picking-masivo', label: 'Picking Masivo', labelCorto: 'Picking', roles: ['admin', 'supervisor'],
-    icono: IcoPicking,
-  },
-  // ── Operador: ruta operador de picking masivo ─────────────────────────────
-  {
-    ruta: '/picking-masivo/operador', label: 'Picking Masivo', labelCorto: 'Picking', roles: ['operador'],
-    icono: IcoPicking,
   },
   // ── Solo Admin ───────────────────────────────────────────────────────────
   {

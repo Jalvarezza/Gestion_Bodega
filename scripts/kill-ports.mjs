@@ -2,7 +2,7 @@
 import { execSync } from 'child_process'
 import { platform }  from 'os'
 
-const PORTS = [3000, 5173, 5174]
+const PORTS = [3001, 5180]
 
 function killWindows(port) {
   try {

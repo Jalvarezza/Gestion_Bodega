@@ -6,9 +6,9 @@
   "scripts": {
     "kill-ports": "node scripts/kill-ports.mjs",
     "predev": "node scripts/kill-ports.mjs",
-    "dev": "concurrently --kill-others --kill-others-on-fail --names \"next,vite\" --prefix-colors \"blue,green\" \"next dev -p 3000\" \"vite\"",
+    "dev": "concurrently --kill-others --kill-others-on-fail --names \"next,vite\" --prefix-colors \"blue,green\" \"next dev -p 3001\" \"vite\"",
     "dev:vite": "vite",
-    "dev:next": "next dev -p 3000",
+    "dev:next": "next dev -p 3001",
     "build": "tsc -b && vite build && cp dist/index.html dist/404.html",
     "lint": "eslint .",
     "preview": "vite preview"

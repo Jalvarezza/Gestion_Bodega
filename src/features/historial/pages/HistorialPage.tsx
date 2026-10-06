@@ -5,8 +5,6 @@ import { TIPOS_MOVIMIENTO, TIPO_LABELS } from '../services/historial.api'
 import type { MovimientoHistorial, ObtenerMovimientosInput, OCResumen, ProductoEnOC } from '../services/historial.api'
 import { useNotas } from '../../notas/hooks/useNotas'
 import type { NotaResumen } from '../../notas/services/notas.api'
-import { useSesionesPicking } from '../../picking-masivo/hooks/usePickingMasivo'
-import type { SesionResumen } from '../../picking-masivo/services/picking-masivo.api'
 
 const LIMITE = 50
 
@@ -1147,128 +1145,6 @@ function IngresosHistorialView() {
   )
 }
 
-// ── Vista Picking Masivo — todas las sesiones ─────────────────────────────
-
-const ESTADO_PM_LABELS: Record<string, string> = {
-  validando:  'Validando',
-  activa:     'Activa',
-  completada: 'Completada',
-  despachado: 'Despachado',
-  cancelada:  'Cancelada',
-}
-
-function formatFechaPM(iso: string | null | undefined): string {
-  if (!iso) return '—'
-  return iso.slice(0, 10).split('-').reverse().join('-')
-}
-
-const ESTADO_PM_COLORS: Record<string, { color: string; bg: string }> = {
-  activa:     { color: '#86efac', bg: 'rgba(34,197,94,0.15)' },
-  validando:  { color: '#fbbf24', bg: 'rgba(251,191,36,0.15)' },
-  completada: { color: '#7dd3fc', bg: 'rgba(14,165,233,0.15)' },
-  despachado: { color: '#c4b5fd', bg: 'rgba(139,92,246,0.15)' },
-  cancelada:  { color: '#f87171', bg: 'rgba(239,68,68,0.15)' },
-}
-
-function SesionPickingCard({ sesion }: { sesion: SesionResumen }) {
-  const navigate = useNavigate()
-  const creadoPor     = (sesion as any).creado_por_usuario?.nombre ?? null
-  const despachPor    = (sesion as any).despachado_por_usuario?.nombre ?? null
-  const fechaCreacion = formatFechaPM(sesion.creado_en)
-  const fechaDespacho = formatFechaPM((sesion as any).despachado_en)
-  const chofer        = (sesion as any).nombre_chofer ?? null
-  const cfg           = ESTADO_PM_COLORS[sesion.estado] ?? { color: '#94a3b8', bg: 'rgba(148,163,184,0.15)' }
-  const progreso      = sesion.total_items > 0 ? Math.round((sesion.items_completados / sesion.total_items) * 100) : 0
-
-  return (
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={() => navigate(`/picking-masivo/${sesion.id}`)}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') navigate(`/picking-masivo/${sesion.id}`) }}
-      style={{
-        display: 'flex', flexDirection: 'column', gap: '0.6rem',
-        padding: '1rem 1.1rem',
-        background: 'var(--bg-card)',
-        border: '1px solid var(--border)',
-        borderRadius: '14px',
-        cursor: 'pointer',
-        transition: 'background 0.15s',
-      }}
-    >
-      {/* Fila 1: OC + estado */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-        <span style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-primary)', letterSpacing: '-0.01em' }}>
-          {sesion.numero_oc}
-        </span>
-        <span style={{ flex: 1, fontSize: '0.85rem', color: 'var(--text-secondary)', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-          {sesion.nombre_cliente ?? '—'}
-        </span>
-        <span style={{ fontSize: '0.72rem', fontWeight: 700, padding: '3px 12px', borderRadius: '999px', whiteSpace: 'nowrap', color: cfg.color, background: cfg.bg }}>
-          {ESTADO_PM_LABELS[sesion.estado] ?? sesion.estado}
-        </span>
-      </div>
-
-      {/* Barra de progreso */}
-      <div style={{ height: '4px', borderRadius: '999px', background: 'var(--border)', overflow: 'hidden' }}>
-        <div style={{ height: '100%', width: `${progreso}%`, background: cfg.color, borderRadius: '999px', transition: 'width 0.3s' }} />
-      </div>
-
-      {/* Fila 2: auditoría */}
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.3rem 1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-        <span style={{ whiteSpace: 'nowrap' }}>
-          <span style={{ marginRight: 4 }}>📅</span>{fechaCreacion}
-          {creadoPor && <> · <strong style={{ color: 'var(--text-secondary)' }}>{creadoPor}</strong></>}
-        </span>
-        {despachPor && (
-          <span style={{ whiteSpace: 'nowrap' }}>
-            <span style={{ marginRight: 4 }}>🚚</span>
-            <strong style={{ color: 'var(--text-secondary)' }}>{despachPor}</strong>
-            {chofer && <> · {chofer}</>}
-            {fechaDespacho !== '—' && <> · {fechaDespacho}</>}
-          </span>
-        )}
-        <span style={{ whiteSpace: 'nowrap' }}>
-          <span style={{ marginRight: 4 }}>📦</span>
-          <strong style={{ color: 'var(--text-secondary)' }}>{sesion.items_completados}/{sesion.total_items}</strong> ítems
-        </span>
-      </div>
-    </div>
-  )
-}
-
-function PickingHistorialView() {
-  const { data, isLoading, isError } = useSesionesPicking()
-  const sesiones = (data as SesionResumen[] | undefined) ?? []
-
-  return (
-    <div className="hist-notas-view">
-      <h2 className="hing-titulo">Picking Masivo</h2>
-      {isLoading && <div className="hist-cargando"><span className="spinner" /><span>Cargando sesiones…</span></div>}
-      {isError   && <p className="error">Error al cargar sesiones</p>}
-      {!isLoading && !isError && (
-        <>
-          <p className="notas-conteo">{sesiones.length} sesión{sesiones.length !== 1 ? 'es' : ''}</p>
-          {sesiones.length === 0
-            ? <p className="vacio">No hay sesiones registradas</p>
-            : (
-              <div className="notas-lista-panel">
-                <div className="notas-lista-scroll">
-                  <div className="notas-lista-filas">
-                    {sesiones.map((s) => (
-                      <SesionPickingCard key={s.id} sesion={s} />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )
-          }
-        </>
-      )}
-    </div>
-  )
-}
-
 // ── Tabla Kardex — vista densa admin ─────────────────────────────────────
 
 function TablaKardex({
@@ -1352,7 +1228,7 @@ type ErrorFiltro = { desde?: string; hasta?: string; rango?: string }
 export function HistorialPage() {
   const hoyIso = new Date().toISOString().slice(0, 10)
 
-  const [vista,               setVista]               = useState<'movimientos' | 'notas' | 'ingresos' | 'picking'>('movimientos')
+  const [vista,               setVista]               = useState<'movimientos' | 'notas' | 'ingresos'>('movimientos')
   const [filtros,             setFiltros]             = useState<ObtenerMovimientosInput | null>({ limite: LIMITE, offset: 0, desde: hoyIso, hasta: hoyIso })
   const [detalle,             setDetalle]             = useState<DetalleContexto>(null)
   const [tipoInput,           setTipoInput]           = useState('')
@@ -1484,15 +1360,6 @@ export function HistorialPage() {
                 </svg>
               ),
             },
-            {
-              key: 'picking',
-              label: 'PM',
-              icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={15} height={15}>
-                  <rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
-                </svg>
-              ),
-            },
           ] as { key: typeof vista; label: string; icon: React.ReactNode }[]
         ).map(({ key, label, icon }) => (
           <button
@@ -1511,8 +1378,6 @@ export function HistorialPage() {
       </div>
 
       {vista === 'ingresos' && <IngresosHistorialView />}
-
-      {vista === 'picking' && <PickingHistorialView />}
 
       {vista === 'notas' && (
         <NotasHistorialView />

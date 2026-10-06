@@ -28,7 +28,6 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: string |
 // ── Íconos ────────────────────────────────────────────────────────────────
 
 function IcoBox()     { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg> }
-function IcoImport()  { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg> }
 function IcoTruck()   { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> }
 function IcoChart()   { return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> }
 function IcoActivity(){ return <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg> }
@@ -161,13 +160,6 @@ function DashboardBIInner() {
           onClick={() => navigate('/notas')}
         />
         <KpiOp
-          icon={<IcoImport />}
-          label="Imp. en tránsito"
-          valor={kpisLoading ? '—' : kpis?.ocPendientes ?? 0}
-          sub={!kpisLoading && !kpis?.ocPendientes ? 'Sin importaciones' : undefined}
-          onClick={() => navigate('/ingresos')}
-        />
-        <KpiOp
           icon={<IcoTruck />}
           label="NV por revisar"
           valor={kpisLoading ? '—' : kpis?.notasDespacho ?? 0}
@@ -212,14 +204,11 @@ function DashboardBIInner() {
                   <p className="bi-dia-detalle-vacio">Sin despachos ese día</p>
                 )}
                 {!cargandoDia && (Array.isArray(notasDia) ? notasDia : []).map(n => {
-                  const ruta =
-                    n.tipo === 'nv'     ? `/notas/${n.id}` :
-                    n.tipo === 'sesion' ? `/picking-masivo/${n.id}` :
-                                         `/picking-masivo/ola/${n.id}`
+                  const ruta = n.tipo === 'nv' ? `/notas/${n.id}` : null
                   const tipoBadge  = n.tipo === 'nv' ? 'NV' : n.tipo === 'sesion' ? 'PM' : 'OLA'
                   const badgeColor = n.tipo === 'nv' ? '#34d399' : n.tipo === 'sesion' ? '#f59e0b' : '#a78bfa'
                   return (
-                    <button type="button" key={`${n.tipo}-${n.id}`} className="bi-dia-nota-row" onClick={() => navigate(ruta)}>
+                    <button type="button" key={`${n.tipo}-${n.id}`} className="bi-dia-nota-row" onClick={() => ruta && navigate(ruta)}>
                       <span className="bi-dia-nota-tipo" style={{ color: badgeColor }}>{tipoBadge}</span>
                       <span className="bi-dia-nota-num">{n.referencia}</span>
                       <span className="bi-dia-nota-cliente">{n.nombreCliente}</span>
