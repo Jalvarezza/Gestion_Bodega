@@ -77,7 +77,7 @@ export function useNotificacionesAlIngreso(
           if (!esInicial) guardarUltimaVisita()
         }
 
-        if (rol === 'supervisor') {
+        if (rol === 'validador') {
           for (const nota of notas) {
             if (!notifiedRef.current.has(nota.id)) {
               notifiedRef.current.add(nota.id)
@@ -98,7 +98,7 @@ export function useNotificacionesAlIngreso(
           }
         }
 
-        if (rol === 'admin') {
+        if (rol === 'admin' || rol === 'supervisor') {
           for (const nota of notas) {
             const key = `${nota.id}_${nota.estado}`
             if (!notifiedRef.current.has(key)) {
@@ -106,7 +106,7 @@ export function useNotificacionesAlIngreso(
               cbRef.current({
                 tipo:    nota.estado === 'despachada' ? 'nota_completa' : 'nueva_nota',
                 mensaje: nota.estado === 'despachada'
-                  ? `Supervisor despachó la nota ${nota.numero_nota}`
+                  ? `Se despachó la nota ${nota.numero_nota}`
                   : `Operador completó la nota ${nota.numero_nota}`,
               })
             }
@@ -119,7 +119,7 @@ export function useNotificacionesAlIngreso(
                 tipo:    'nota_completa',
                 mensaje: sesion.estado === 'completada'
                   ? `Operador completó sesión ${labelSesion(sesion)}`
-                  : `Supervisor despachó sesión ${labelSesion(sesion)}`,
+                  : `Se despachó la sesión ${labelSesion(sesion)}`,
               })
             }
           }

@@ -4,7 +4,7 @@ import type { UserRole } from '../types/base'
 
 // Rutas que solo puede ver admin
 const RUTAS_SOLO_ADMIN = ['/usuarios']
-// Rutas que puede ver admin + supervisor (no operador)
+// Rutas bloqueadas para el operador
 const RUTAS_ADMIN_SUPERVISOR = ['/salidas', '/historial', '/inventario-inicial']
 
 interface Props {
@@ -63,7 +63,7 @@ export function ProtectedRoute({ children, rutaActual }: Props) {
     return <Navigate to="/login" replace />
   }
 
-  // Operador intenta ruta de admin o admin+supervisor → /productos
+  // Operador intenta ruta bloqueada → /productos
   if (rol === 'operador') {
     const bloqueada = (
       RUTAS_SOLO_ADMIN.some((r) => rutaActual.startsWith(r))
@@ -72,8 +72,8 @@ export function ProtectedRoute({ children, rutaActual }: Props) {
     if (bloqueada) return <Navigate to="/productos" replace />
   }
 
-  // Supervisor intenta ruta solo-admin → /home
-  if (rol === 'supervisor') {
+  // Supervisor o validador intenta ruta solo-admin → /home
+  if (rol === 'supervisor' || rol === 'validador') {
     const bloqueada = RUTAS_SOLO_ADMIN.some((r) => rutaActual.startsWith(r))
     if (bloqueada) return <Navigate to="/home" replace />
   }

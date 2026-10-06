@@ -19,8 +19,8 @@ export const devolucionesService = {
   async registrarDevolucion(input: RegistrarDevolucionInput): Promise<ServiceResult<{ procesados: number }>> {
     const { data: usuario } = await supabase
       .from('usuarios').select('rol').eq('id', input.adminId).single()
-    if (!usuario || !['admin', 'supervisor'].includes(usuario.rol)) {
-      return { ok: false, error: { code: 'UNAUTHORIZED', message: 'Solo admin o supervisor puede registrar devoluciones' } }
+    if (!usuario || !['admin', 'supervisor', 'validador'].includes(usuario.rol)) {
+      return { ok: false, error: { code: 'UNAUTHORIZED', message: 'Solo admin, supervisor o validador puede registrar devoluciones' } }
     }
 
     const { data: nota } = await supabase

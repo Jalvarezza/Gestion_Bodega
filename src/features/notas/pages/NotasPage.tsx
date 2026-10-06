@@ -122,6 +122,7 @@ export function NotasPage() {
   const { offline } = useConectividad()
   const ADMIN_ID    = localStorage.getItem('user_id') ?? ''
   const ROL         = localStorage.getItem('user_rol') ?? ''
+  const puedeImportar = ROL === 'admin' || ROL === 'supervisor'
   const [tabActivo,       setTabActivo]       = useState<'pendientes' | 'completas'>('pendientes')
   const [filtroAnio,      setFiltroAnio]      = useState<string | undefined>(undefined)
   const [filtroMes,       setFiltroMes]       = useState<string | undefined>(undefined)
@@ -175,7 +176,7 @@ export function NotasPage() {
     return lista
   }, [notas, tabActivo, busqueda, filtroAnio, filtroMes, filtroDia, tieneFiltrFecha, hoy])
 
-  if (importar && ROL === 'admin') {
+  if (importar && puedeImportar) {
     return (
       <ImportarNotaFlow
         adminId={ADMIN_ID}
@@ -199,7 +200,7 @@ export function NotasPage() {
 
   function labelBoton(nota: NotaResumen): string {
     if (nota.estado === 'completa') return 'Ver nota'
-    if (ROL === 'admin' || ROL === 'supervisor') return 'Ver detalle →'
+    if (ROL === 'admin' || ROL === 'supervisor' || ROL === 'validador') return 'Ver detalle →'
     if (nota.estado === 'preparacion') return 'Continuar Picking →'
     return 'Iniciar Picking →'
   }
@@ -262,7 +263,7 @@ export function NotasPage() {
           Filtro
           {filtrosActivos > 0 && <span className="ing-filtrar-badge">{filtrosActivos}</span>}
         </button>
-        {ROL === 'admin' && (
+        {puedeImportar && (
           <button className="btn-primario" style={{ flexShrink: 0 }} onClick={() => setImportar(true)} disabled={offline}>
             + NV
           </button>

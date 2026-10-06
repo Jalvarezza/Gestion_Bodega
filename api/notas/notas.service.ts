@@ -168,7 +168,7 @@ async function verificarAdmin(adminId: string): Promise<boolean> {
   const cached = _adminCache.get(adminId)
   if (cached && cached.expiresAt > Date.now()) return cached.esAdmin
   const { data } = await supabase.from('usuarios').select('rol').eq('id', adminId).single()
-  const esAdmin = data?.rol === 'admin' || data?.rol === 'supervisor'
+  const esAdmin = data?.rol === 'admin' || data?.rol === 'supervisor' || data?.rol === 'validador'
   _adminCache.set(adminId, { esAdmin, expiresAt: Date.now() + 30_000 })
   return esAdmin
 }
@@ -1197,7 +1197,7 @@ export const notasService = {
       return { ok: true, data: { notas: rNotas.data ?? [], sesiones: rSesiones.data ?? [] } }
     }
 
-    if (rol === 'supervisor') {
+    if (rol === 'validador') {
       const [rNotas, rSesiones] = await Promise.all([
         supabase.from('notas_venta').select('id, numero_nota, estado').eq('estado', 'completa'),
         supabase.from('sesiones_picking_masivo').select('id, numero_oc, nombre_cliente, estado').eq('estado', 'completada'),
@@ -1205,7 +1205,7 @@ export const notasService = {
       return { ok: true, data: { notas: rNotas.data ?? [], sesiones: rSesiones.data ?? [] } }
     }
 
-    // admin: notas completa (operador terminó) y despachada (supervisor despachó)
+    // admin y supervisor: notas completa (operador terminó) y despachada
     let qNotas = supabase.from('notas_venta')
       .select('id, numero_nota, estado')
       .in('estado', ['completa', 'despachada'])

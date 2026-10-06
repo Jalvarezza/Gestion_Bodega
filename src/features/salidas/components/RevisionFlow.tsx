@@ -282,7 +282,7 @@ export function RevisionFlow({
 }: Props) {
   const yaDespachada = estadoNota === 'despachada'
   const rolUsuario   = localStorage.getItem('user_rol') ?? ''
-  const esAdmin      = rolUsuario === 'admin' || rolUsuario === 'supervisor'
+  const esAdmin      = rolUsuario === 'admin' || rolUsuario === 'supervisor' || rolUsuario === 'validador'
 
   const [paso, setPaso]           = useState<Paso>({ tipo: 'lista' })
   const [cantidad, setCantidad]   = useState('')

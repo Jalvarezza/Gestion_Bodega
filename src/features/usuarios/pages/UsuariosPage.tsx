@@ -3,16 +3,18 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../shared/utils/apiClient'
 
 type Usuario = { id: string; nombre: string; email: string; rol: string }
-type Rol = 'admin' | 'supervisor' | 'operador'
+type Rol = 'admin' | 'supervisor' | 'validador' | 'operador'
 
 const ROL_LABELS: Record<Rol, string> = {
   admin:      'Administrador',
   supervisor: 'Supervisor',
+  validador:  'Validador',
   operador:   'Operador',
 }
 const ROL_COLORS: Record<Rol, string> = {
   admin:      'var(--accent)',
   supervisor: '#a78bfa',
+  validador:  '#f59e0b',
   operador:   'var(--success)',
 }
 
@@ -185,6 +187,7 @@ export function UsuariosPage() {
                 <select className="pm-confirmar-input" value={rol} onChange={(e) => setRol(e.target.value as Rol)}
                   style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>
                   <option value="operador">Operador</option>
+                  <option value="validador">Validador</option>
                   <option value="supervisor">Supervisor</option>
                   <option value="admin">Administrador</option>
                 </select>
@@ -210,6 +213,7 @@ export function UsuariosPage() {
               <select className="pm-confirmar-input" value={nuevoRol} onChange={(e) => setNuevoRol(e.target.value as Rol)}
                 style={{ background: 'var(--bg-elevated)', color: 'var(--text-primary)' }}>
                 <option value="operador">Operador</option>
+                <option value="validador">Validador</option>
                 <option value="supervisor">Supervisor</option>
                 <option value="admin">Administrador</option>
               </select>

@@ -3,7 +3,7 @@ import { usuariosService } from '../../api/usuarios/usuarios.service'
 import { json, type Env } from '../_lib/cf'
 import { z } from 'zod'
 
-const ROLES_VALIDOS = ['admin', 'supervisor', 'operador'] as const
+const ROLES_VALIDOS = ['admin', 'supervisor', 'validador', 'operador'] as const
 
 const crearSchema = z.object({
   nombre:   z.string().min(2),

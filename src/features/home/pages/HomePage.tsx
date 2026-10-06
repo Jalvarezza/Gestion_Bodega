@@ -45,8 +45,8 @@ const NAV_ITEMS: NavItem[] = [
   { ruta: '/productos',               key: 'productos',   label: 'Busqueda',       desc: 'Buscar stock por SKU' },
   { ruta: '/ubicaciones',             key: 'ubicaciones', label: 'Mapa Bodega',    desc: 'Ver estructura de bodega' },
   { ruta: '/notas',                   key: 'notas',       label: 'NV preparacion', desc: 'Picking y despacho' },
-  { ruta: '/salidas',                 key: 'salidas',     label: 'NV despacho',    desc: 'Revisión antes de despacho',     roles: ['admin', 'supervisor'] },
-  { ruta: '/historial',               key: 'historial',   label: 'Historial',      desc: 'Auditoría de movimientos',       roles: ['admin', 'supervisor'] },
+  { ruta: '/salidas',                 key: 'salidas',     label: 'NV despacho',    desc: 'Revisión antes de despacho',     roles: ['admin', 'supervisor', 'validador'] },
+  { ruta: '/historial',               key: 'historial',   label: 'Historial',      desc: 'Auditoría de movimientos',       roles: ['admin', 'supervisor', 'validador'] },
 ]
 
 // ── KPI card ──────────────────────────────────────────────────────────────
@@ -138,8 +138,8 @@ export function HomePage() {
   const rol    = localStorage.getItem('user_rol') as UserRole | null
   const nombre = localStorage.getItem('user_nombre') ?? ''
 
-  // Admin + Supervisor: dashboard BI ejecutivo completo
-  if (rol === 'admin' || rol === 'supervisor') {
+  // Admin + Supervisor + Validador: dashboard BI ejecutivo completo
+  if (rol === 'admin' || rol === 'supervisor' || rol === 'validador') {
     return <DashboardBI />
   }
 

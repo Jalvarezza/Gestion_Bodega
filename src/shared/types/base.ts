@@ -8,7 +8,7 @@ export type ServiceResult<T> =
   | { ok: true; data: T }
   | { ok: false; error: DomainError }
 
-export type UserRole = 'admin' | 'supervisor' | 'operador'
+export type UserRole = 'admin' | 'supervisor' | 'validador' | 'operador'
 
 export type AuthUser = {
   id: string

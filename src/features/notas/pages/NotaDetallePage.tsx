@@ -407,7 +407,7 @@ function Stepper({ estadoActual }: { estadoActual: string }) {
 // ─── Página principal ──────────────────────────────────────────────────────
 export function NotaDetallePage() {
   const operadorId          = localStorage.getItem('user_id') ?? ''
-  const esAdmin             = ['admin', 'supervisor'].includes(localStorage.getItem('user_rol') ?? '')
+  const esAdmin             = ['admin', 'supervisor', 'validador'].includes(localStorage.getItem('user_rol') ?? '')
   const navigate            = useNavigate()
   const { id: notaId = '' } = useParams<{ id: string }>()
   const { offline }         = useConectividad()

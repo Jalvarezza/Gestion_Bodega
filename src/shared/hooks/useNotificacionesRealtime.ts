@@ -59,7 +59,7 @@ export function useNotificacionesRealtime(
       return () => { supabase.removeChannel(canal) }
     }
 
-    if (rol === 'supervisor' || rol === 'admin') {
+    if (rol === 'admin' || rol === 'supervisor' || rol === 'validador') {
       const canal = supabase
         .channel('notif:supervisor:notas')
         .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'notas_venta' }, (payload) => {

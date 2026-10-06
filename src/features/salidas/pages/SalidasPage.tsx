@@ -148,7 +148,7 @@ function RevisionConDetalle({
 // ─── Página principal ──────────────────────────────────────────────────────
 export function SalidasPage() {
   const adminId     = localStorage.getItem('user_id') ?? ''
-  const esAdmin     = ['admin', 'supervisor'].includes(localStorage.getItem('user_rol') ?? '')
+  const esAdmin     = ['admin', 'supervisor', 'validador'].includes(localStorage.getItem('user_rol') ?? '')
   const { offline } = useConectividad()
   const [vista, setVista] = useState<Vista>({ tipo: 'lista' })
   const { data, isLoading, isError } = useNotasParaRevision()

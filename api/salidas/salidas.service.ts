@@ -6,7 +6,7 @@ async function verificarAdmin(adminId: string): Promise<boolean> {
   const cached = _adminCache.get(adminId)
   if (cached && cached.expiresAt > Date.now()) return cached.esAdmin
   const { data } = await supabase.from('usuarios').select('rol').eq('id', adminId).single()
-  const esAdmin = data?.rol === 'admin' || data?.rol === 'supervisor'
+  const esAdmin = data?.rol === 'admin' || data?.rol === 'supervisor' || data?.rol === 'validador'
   _adminCache.set(adminId, { esAdmin, expiresAt: Date.now() + 30_000 })
   return esAdmin
 }

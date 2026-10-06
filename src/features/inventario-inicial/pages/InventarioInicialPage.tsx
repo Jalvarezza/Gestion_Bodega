@@ -6,12 +6,13 @@ export function InventarioInicialPage() {
   const navigate   = useNavigate()
   const usuarioId  = localStorage.getItem('user_id')  ?? ''
   const rol        = localStorage.getItem('user_rol')  ?? ''
+  const permitido  = rol === 'admin' || rol === 'supervisor'
 
   useEffect(() => {
-    if (rol !== 'admin') navigate('/home', { replace: true })
-  }, [rol, navigate])
+    if (!permitido) navigate('/home', { replace: true })
+  }, [permitido, navigate])
 
-  if (rol !== 'admin') return null
+  if (!permitido) return null
 
   return (
     <div className="inv2-page">

@@ -40,18 +40,18 @@ const IcoReporte  = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 // ─────────────────────────────────────────────────────────────────────────────
 //  MATRIZ DE NAVEGACIÓN POR ROL
 //
-//  admin:      Dashboard BI, Busqueda, Mapa, NV Prep, NV Desp, Historial,
-//              Ubicación Inicial, Usuarios
-//  supervisor: Dashboard BI, Busqueda, Mapa, NV Despacho, Historial, Ubicación
+//  admin:      todo (incluye Usuarios)
+//  supervisor: igual que admin, excepto Usuarios
+//  validador:  Dashboard BI, Busqueda, Mapa, NV Despacho, Historial, Ubicación
 //  operador:   Busqueda, Mapa, NV Preparación, Ubicación
 // ─────────────────────────────────────────────────────────────────────────────
 const NAV_ITEMS: NavItem[] = [
-  // ── Solo Admin ───────────────────────────────────────────────────────────
+  // ── Admin + Supervisor + Validador ───────────────────────────────────────
   {
-    ruta: '/home', label: 'Dashboard BI', labelCorto: 'Dashboard', roles: ['admin', 'supervisor'],
+    ruta: '/home', label: 'Dashboard BI', labelCorto: 'Dashboard', roles: ['admin', 'supervisor', 'validador'],
     icono: IcoDashboard,
   },
-  // ── Admin + Supervisor + Operador ────────────────────────────────────────
+  // ── Todos ────────────────────────────────────────────────────────────────
   {
     ruta: '/productos', label: 'Busqueda', labelCorto: 'Busqueda',
     icono: IcoSearch,
@@ -60,24 +60,24 @@ const NAV_ITEMS: NavItem[] = [
     ruta: '/ubicaciones', label: 'Mapa Bodega', labelCorto: 'Mapa',
     icono: IcoMap,
   },
-  // ── Admin + Operador ─────────────────────────────────────────────────────
-  {
-    ruta: '/notas', label: 'NV preparacion', labelCorto: 'NV prep', roles: ['admin', 'operador'],
-    icono: IcoNVPrep,
-  },
-  // ── Admin + Supervisor ───────────────────────────────────────────────────
-  {
-    ruta: '/salidas', label: 'NV despacho', labelCorto: 'NV desp', roles: ['admin', 'supervisor'],
-    icono: IcoNVDesp,
-  },
-  // ── Admin + Supervisor ───────────────────────────────────────────────────
-  {
-    ruta: '/historial', label: 'Historial', labelCorto: 'Historial', roles: ['admin', 'supervisor'],
-    icono: IcoHistoria,
-  },
   // ── Admin + Supervisor + Operador ────────────────────────────────────────
   {
-    ruta: '/inventario-inicial', label: 'Ubicacion Inicial', labelCorto: 'Ubicación', roles: ['admin', 'supervisor', 'operador'],
+    ruta: '/notas', label: 'NV preparacion', labelCorto: 'NV prep', roles: ['admin', 'supervisor', 'operador'],
+    icono: IcoNVPrep,
+  },
+  // ── Admin + Supervisor + Validador ───────────────────────────────────────
+  {
+    ruta: '/salidas', label: 'NV despacho', labelCorto: 'NV desp', roles: ['admin', 'supervisor', 'validador'],
+    icono: IcoNVDesp,
+  },
+  // ── Admin + Supervisor + Validador ───────────────────────────────────────
+  {
+    ruta: '/historial', label: 'Historial', labelCorto: 'Historial', roles: ['admin', 'supervisor', 'validador'],
+    icono: IcoHistoria,
+  },
+  // ── Todos ────────────────────────────────────────────────────────────────
+  {
+    ruta: '/inventario-inicial', label: 'Ubicacion Inicial', labelCorto: 'Ubicación', roles: ['admin', 'supervisor', 'validador', 'operador'],
     icono: IcoUbicacion,
   },
   // ── Solo Admin ───────────────────────────────────────────────────────────

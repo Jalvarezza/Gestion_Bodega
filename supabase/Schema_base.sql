@@ -29,7 +29,7 @@ $$;
 CREATE TABLE usuarios (
   id          uuid        PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
   nombre      text        NOT NULL,
-  rol         text        NOT NULL CHECK (rol IN ('admin', 'supervisor', 'operador')),
+  rol         text        NOT NULL CHECK (rol IN ('admin', 'supervisor', 'validador', 'operador')),
   created_at  timestamptz NOT NULL DEFAULT now()
 );
 
