@@ -1,6 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useNotas } from '../hooks/useNotas'
+import { useNotas, useTomarNota } from '../hooks/useNotas'
+import { useNotasRealtime } from '../hooks/useNotasRealtime'
+import { ApiResponseError } from '../../../shared/utils/apiClient'
 import { useConectividad } from '../../../shared/hooks/useConectividad'
 import { ImportarNotaFlow } from '../components/ImportarNotaFlow'
 import type { NotaResumen } from '../services/notas.api'
@@ -132,6 +134,23 @@ export function NotasPage() {
   const [importar,        setImportar]        = useState(false)
   const [seleccionadaId,  setSeleccionadaId]  = useState<string | null>(null)
   const { data, isLoading, isError, refetch } = useNotas(undefined)
+  const tomarNota = useTomarNota()
+  const [errorToma, setErrorToma] = useState<string | null>(null)
+  useNotasRealtime()
+
+  // El operador bloquea la NV al iniciar el picking; el resto de roles solo consulta el detalle
+  async function abrirNota(nota: NotaResumen) {
+    setErrorToma(null)
+    if (ROL === 'operador' && (nota.estado === 'pendiente' || nota.estado === 'preparacion')) {
+      try {
+        await tomarNota.mutateAsync({ usuarioId: ADMIN_ID, notaId: nota.notaId })
+      } catch (e) {
+        setErrorToma(e instanceof ApiResponseError ? e.message : 'No se pudo iniciar el picking de esta nota')
+        return
+      }
+    }
+    navigate(`/notas/${nota.notaId}`)
+  }
 
   const notas = data ?? []
 
@@ -343,6 +362,8 @@ export function NotasPage() {
         </div>
       )}
 
+      {errorToma && <p className="error">{errorToma}</p>}
+
       {!isLoading && !isError && notasFiltradas.length > 0 && (
         <div className="notas-cards">
           {notasFiltradas.map((nota: NotaResumen) => {
@@ -410,8 +431,8 @@ export function NotasPage() {
                   {marcada && (
                     <button
                       className={`btn-primario nota-card-btn ${nota.estado === 'preparacion' ? 'nota-card-btn--continuar' : ''}`}
-                      disabled={bloqueada}
-                      onClick={() => navigate(`/notas/${nota.notaId}`)}
+                      disabled={bloqueada || tomarNota.isPending}
+                      onClick={() => void abrirNota(nota)}
                     >
                       {labelBoton(nota)}
                     </button>

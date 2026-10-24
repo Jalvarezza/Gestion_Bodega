@@ -47,6 +47,9 @@ export const notasApi = {
   cambiarEstado: (body: CambiarEstadoInput) =>
     apiClient.post<CambiarEstadoResult>('/notas?accion=cambiar-estado', body),
 
+  tomarNota: (body: { usuarioId: string; notaId: string }) =>
+    apiClient.post<{ notaId: string }>('/notas?accion=tomar', body),
+
   enviarARevision: (body: EnviarARevisionInput) =>
     apiClient.post<EnviarARevisionResult>('/notas?accion=enviar-revision', body),
 
