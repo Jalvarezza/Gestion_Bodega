@@ -111,17 +111,19 @@ function EquivalenteCard({ eq, seleccionado, onSeleccionar }: { eq: ProductoConS
 }
 
 export function PickingFlow({ item, usuarioId, onCompletado, onCerrar }: Props) {
-  const [paso, setPaso]                   = useState<Paso>({ tipo: 'escanear_producto', paradaIdx: 0 })
-  const [cantidad, setCantidad]           = useState('')
+  // El rack se escanea siempre primero: se parte en la primera parada FIFO, o en 'inicio' si no hay ubicación
+  const [plan, setPlan]                   = useState<Parada[]>(() => calcularPlan(item.ubicaciones, item.cantidadSolicitada - item.cantidadDespachada))
+  const [paso, setPaso]                   = useState<Paso>(() => plan.length > 0 ? { tipo: 'escanear_rack', paradaIdx: 0 } : { tipo: 'inicio' })
+  const [cantidad, setCantidad]           = useState(() => plan[0]?.cantidadATomar?.toString() ?? '')
   const [error, setError]                 = useState<string | null>(null)
   const [equivalenteId, setEquivalenteId] = useState<string | null>(null)
   const [motivo, setMotivo]               = useState('')
-  const [plan, setPlan]                   = useState<Parada[]>([])
   const [pickedSoFar, setPickedSoFar]     = useState(0)
 
   const productoInputRef = useRef<HTMLInputElement>(null)
   const rackInputRef     = useRef<HTMLInputElement>(null)
   const scanCooldownRef  = useRef(false)
+  const rackValidadoRef  = useRef<string | null>(null)
 
   const registrarPicking = useRegistrarPicking()
 
@@ -169,29 +171,34 @@ export function PickingFlow({ item, usuarioId, onCompletado, onCerrar }: Props) 
       const siguienteParada = plan[siguienteIdx]
       setCantidad(siguienteParada?.cantidadATomar?.toString() ?? '')
       if (rackInputRef.current) rackInputRef.current.value = ''
+      rackValidadoRef.current = null
       setPaso({ tipo: 'escanear_rack', paradaIdx: siguienteIdx, equivalenteId: paso.equivalenteId })
     }
   }
 
-  function handleIniciarPicking() {
-    const planCalculado = calcularPlan(ubicacionesFifo, cantidadPendiente)
+  function iniciarPlan(ubicaciones: Ubicacion[], eqId?: string) {
+    const planCalculado = calcularPlan(ubicaciones, cantidadPendiente)
+    if (planCalculado.length === 0) {
+      setError('El producto no tiene stock en ninguna ubicación. Regístralo como sin stock o usa un equivalente.')
+      setPaso({ tipo: 'inicio' })
+      return
+    }
     setPlan(planCalculado)
     setPickedSoFar(0)
-    setCantidad(planCalculado[0]?.cantidadATomar?.toString() ?? '')
-    const primerPaso = planCalculado[0]?.posicionCodigo
-      ? { tipo: 'escanear_rack' as const, paradaIdx: 0, equivalenteId: equivalenteId ?? undefined }
-      : { tipo: 'escanear_producto' as const, paradaIdx: 0, equivalenteId: equivalenteId ?? undefined }
-    setPaso(primerPaso)
+    setCantidad(planCalculado[0].cantidadATomar.toString())
+    rackValidadoRef.current = null
+    if (rackInputRef.current) rackInputRef.current.value = ''
+    setPaso({ tipo: 'escanear_rack', paradaIdx: 0, equivalenteId: eqId })
     setError(null)
+  }
+
+  function handleIniciarPicking() {
+    iniciarPlan(ubicacionesFifo, equivalenteId ?? undefined)
   }
 
   function handleIniciarConEquivalente(eqId: string) {
     setEquivalenteId(eqId)
-    setPlan([])
-    setPickedSoFar(0)
-    setCantidad(cantidadPendiente.toString())
-    setPaso({ tipo: 'escanear_producto', paradaIdx: 0, equivalenteId: eqId })
-    setError(null)
+    iniciarPlan(item.equivalentes.find((e) => e.productoId === eqId)?.ubicaciones ?? [], eqId)
   }
 
   function handleClickEquivalente() {
@@ -208,18 +215,25 @@ export function PickingFlow({ item, usuarioId, onCompletado, onCerrar }: Props) 
     scanCooldownRef.current = true
     setTimeout(() => { scanCooldownRef.current = false }, 500)
     const parada = plan[paso.paradaIdx]
-    if (codigo.trim() !== parada?.posicionCodigo) {
-      setError(`Rack incorrecto. Se esperaba ${parada?.posicionCodigo ?? ''}`)
+    if (!parada?.posicionCodigo || codigo.trim().toUpperCase() !== parada.posicionCodigo.toUpperCase()) {
+      sonarEscaneoError()
+      setError('Ubicación incorrecta. Por favor, diríjase al rack asignado')
       if (rackInputRef.current) rackInputRef.current.value = ''
       rackInputRef.current?.focus()
       return
     }
+    rackValidadoRef.current = parada.posicionCodigo
+    sonarEscaneoExitoso()
     setPaso({ tipo: 'escanear_producto', paradaIdx: paso.paradaIdx, equivalenteId: paso.equivalenteId })
     setError(null)
   }
 
   function handleEscanearProducto(codigo: string) {
     if (!codigo.trim() || codigo.trim().length < 2 || paso.tipo !== 'escanear_producto') return
+    if (!rackValidadoRef.current) {
+      setError('Primero escanea el rack asignado')
+      return
+    }
     if (scanCooldownRef.current) return
     scanCooldownRef.current = true
     setTimeout(() => { scanCooldownRef.current = false }, 500)
@@ -334,6 +348,7 @@ export function PickingFlow({ item, usuarioId, onCompletado, onCerrar }: Props) 
         usarEquivalente:       !!eqId,
         productoEquivalenteId: eqId,
         comentarioOperador:    comentario ?? undefined,
+        codigoRack:            rackValidadoRef.current ?? '',
         loteId,
         esParadaMultiLote:     esParadaIntermedia,
       })
@@ -345,10 +360,8 @@ export function PickingFlow({ item, usuarioId, onCompletado, onCerrar }: Props) 
         setPickedSoFar(nuevoPicked)
         setCantidad(siguienteParada?.cantidadATomar?.toString() ?? '')
         if (rackInputRef.current) rackInputRef.current.value = ''
-        const siguientePaso = siguienteParada?.posicionCodigo
-          ? { tipo: 'escanear_rack' as const, paradaIdx: siguienteIdx, equivalenteId: eqId ?? undefined }
-          : { tipo: 'escanear_producto' as const, paradaIdx: siguienteIdx, equivalenteId: eqId ?? undefined }
-        setPaso(siguientePaso)
+        rackValidadoRef.current = null
+        setPaso({ tipo: 'escanear_rack', paradaIdx: siguienteIdx, equivalenteId: eqId ?? undefined })
         return
       }
 
@@ -407,12 +420,12 @@ export function PickingFlow({ item, usuarioId, onCompletado, onCerrar }: Props) 
             </div>
           ) : (
             <div className="sin-stock-aviso">
-              <p>Sin stock disponible para este producto</p>
+              <p>Producto sin ubicación asignada: no se puede hacer picking hasta que tenga stock en un rack</p>
             </div>
           )}
 
           <div className="inicio-acciones">
-            <button className="btn-primario" onClick={handleIniciarPicking}>
+            <button className="btn-primario" onClick={handleIniciarPicking} disabled={!tieneStock}>
               Iniciar picking
             </button>
             {item.equivalentes.length > 0 && (

@@ -24,6 +24,9 @@ const pickingSchema = z.object({
   usarEquivalente:        z.boolean().optional(),
   productoEquivalenteId:  z.string().uuid().optional(),
   comentarioOperador:     z.string().optional().nullable(),
+  codigoRack:             z.string().trim().min(1),
+  loteId:                 z.string().uuid().optional(),
+  esParadaMultiLote:      z.boolean().optional(),
 })
 
 const sinStockSchema = z.object({
@@ -43,6 +46,11 @@ const cambiarEstadoSchema = z.object({
   notaId:       z.string().uuid(),
   nuevoEstado:  z.literal('despachada'),
   nombreChofer: z.string().min(1),
+})
+
+const tomarNotaSchema = z.object({
+  usuarioId: z.string().uuid(),
+  notaId:    z.string().uuid(),
 })
 
 const enviarRevisionSchema = z.object({
@@ -127,6 +135,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       }
       const result = await notasService.concluirParcial(parsed.data)
       if (!result.ok) return res.status(400).json({ error: result.error })
+      return res.status(200).json(result.data)
+    }
+
+    if (accion === 'tomar') {
+      const parsed = tomarNotaSchema.safeParse(req.body)
+      if (!parsed.success) {
+        return res.status(400).json({ error: { code: 'VALIDATION_ERROR', message: parsed.error.message } })
+      }
+      const result = await notasService.tomarNota(parsed.data)
+      if (!result.ok) {
+        const status = result.error.code === 'NOTA_TOMADA' ? 409 : result.error.code === 'UNAUTHORIZED' ? 403 : result.error.code === 'NOT_FOUND' ? 404 : 400
+        return res.status(status).json({ error: result.error })
+      }
       return res.status(200).json(result.data)
     }
 

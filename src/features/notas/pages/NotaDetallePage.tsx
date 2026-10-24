@@ -1,14 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useDetalleNota, useConcluirParcial, useEnviarARevision, useRegistrarPicking, useEditarNota, useEliminarNota } from '../hooks/useNotas'
+import { useDetalleNota, useConcluirParcial, useEnviarARevision, useRegistrarPicking, useEditarNota, useEliminarNota, useTomarNota } from '../hooks/useNotas'
 import { PickingFlow } from '../components/PickingFlow'
 import { useConectividad } from '../../../shared/hooks/useConectividad'
 import { ApiResponseError } from '../../../shared/utils/apiClient'
 import type { NotaProductoResumen } from '../services/notas.api'
-
-function esSinEscaneo(sku: string) {
-  return sku.toUpperCase().startsWith('CG') || sku.toUpperCase().startsWith('SG')
-}
 
 function formatearFecha(fecha: string): string {
   return fecha.slice(0, 10).split('-').reverse().join('-')
@@ -438,17 +434,18 @@ export function NotaDetallePage() {
     }
   }, [itemPicking])
 
-  async function handleMarcarCompleto(item: NotaProductoResumen) {
-    try {
-      await registrarPicking.mutateAsync({
-        usuarioId:      operadorId,
-        notaProductoId: item.notaProductoId,
-        codigoProducto: item.codigoBarra ?? item.sku,
-        cantidad:       item.cantidadSolicitada - item.cantidadDespachada,
-      })
-      void refetch()
-    } catch { /* silencioso */ }
-  }
+  // Un operador que entra a una NV abierta la bloquea a su nombre (también si llega por enlace o recarga)
+  const tomarNota      = useTomarNota()
+  const tomaIntentada  = useRef(false)
+  const [bloqueoToma, setBloqueoToma] = useState<string | null>(null)
+  useEffect(() => {
+    if (esAdmin || !data || tomaIntentada.current) return
+    if (data.estado !== 'pendiente' && data.estado !== 'preparacion') return
+    tomaIntentada.current = true
+    tomarNota.mutateAsync({ usuarioId: operadorId, notaId })
+      .then(() => { void refetch() })
+      .catch((e) => setBloqueoToma(e instanceof ApiResponseError ? e.message : 'No se pudo iniciar el picking de esta nota'))
+  }, [data, esAdmin, operadorId, notaId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleEnviarARevision() {
     setErrorRevision(null)
@@ -499,11 +496,7 @@ export function NotaDetallePage() {
       return
     }
     setScanError('')
-    if (esSinEscaneo(producto.sku)) {
-      void handleMarcarCompleto(producto)
-    } else {
-      setItemPicking(producto)
-    }
+    setItemPicking(producto)
   }
 
   // ── Carga / error ────────────────────────────────────────────────────────
@@ -520,6 +513,21 @@ export function NotaDetallePage() {
           <span className="nota-bloqueada-icono">🔒</span>
           <p className="nota-bloqueada-titulo">{notaTomada ? 'Nota en preparación' : 'Nota no encontrada'}</p>
           <p className="nota-bloqueada-desc">{notaTomada ? 'Otro operador está preparando esta nota.' : 'No se pudo cargar la nota de venta.'}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (bloqueoToma) {
+    return (
+      <div className="nota-detalle-bloqueada">
+        <button className="btn-volver" onClick={() => navigate('/notas')}>
+          <IcoBack /> Volver
+        </button>
+        <div className="nota-bloqueada-aviso">
+          <span className="nota-bloqueada-icono">🔒</span>
+          <p className="nota-bloqueada-titulo">Nota en preparación</p>
+          <p className="nota-bloqueada-desc">{bloqueoToma}</p>
         </div>
       </div>
     )
@@ -651,24 +659,13 @@ export function NotaDetallePage() {
                   Concluir
                 </button>
               )}
-              {esSinEscaneo(item.sku) ? (
-                <button
-                  className="btn-primario"
-                  style={{ fontSize: '11px', padding: '5px 12px' }}
-                  disabled={registrarPicking.isPending}
-                  onClick={() => void handleMarcarCompleto(item)}
-                >
-                  {registrarPicking.isPending ? '…' : 'Marcar completo'}
-                </button>
-              ) : (
-                <button
-                  className="btn-primario"
-                  style={{ fontSize: '11px', padding: '5px 12px' }}
-                  onClick={() => setItemPicking(item)}
-                >
-                  Picking
-                </button>
-              )}
+              <button
+                className="btn-primario"
+                style={{ fontSize: '11px', padding: '5px 12px' }}
+                onClick={() => setItemPicking(item)}
+              >
+                Picking
+              </button>
             </div>
           )}
         </div>
