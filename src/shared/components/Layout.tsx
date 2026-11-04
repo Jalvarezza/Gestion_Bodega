@@ -30,6 +30,7 @@ type NavItem = {
 const IcoSearch   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
 const IcoMap      = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><rect x="2" y="10" width="20" height="5" rx="1"/><rect x="2" y="17" width="20" height="5" rx="1"/></svg>
 const IcoNVPrep   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+const IcoPicking  = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M3 7h18"/><path d="M3 12h18"/><path d="M3 17h12"/><path d="M17 15l2 2 4-4"/></svg>
 const IcoNVDesp   = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
 const IcoHistoria = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
 const IcoUsuarios = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
@@ -41,8 +42,9 @@ const IcoReporte  = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 //
 //  admin:      todo (incluye Usuarios)
 //  supervisor: igual que admin, excepto Usuarios
+//  (Picking masivo: admin y supervisor cargan OC; operador hace el picking)
 //  validador:  Dashboard BI, Busqueda, Mapa, NV Despacho, Historial
-//  operador:   Busqueda, Mapa, NV Preparación
+//  operador:   Busqueda, Mapa, NV Preparación, Picking masivo
 // ─────────────────────────────────────────────────────────────────────────────
 const NAV_ITEMS: NavItem[] = [
   // ── Admin + Supervisor + Validador ───────────────────────────────────────
@@ -63,6 +65,11 @@ const NAV_ITEMS: NavItem[] = [
   {
     ruta: '/notas', label: 'NV preparacion', labelCorto: 'NV prep', roles: ['admin', 'supervisor', 'operador'],
     icono: IcoNVPrep,
+  },
+  // ── Admin + Supervisor + Operador ────────────────────────────────────────
+  {
+    ruta: '/picking-masivo', label: 'Picking masivo', labelCorto: 'Picking', roles: ['admin', 'supervisor', 'operador'],
+    icono: IcoPicking,
   },
   // ── Admin + Supervisor + Validador ───────────────────────────────────────
   {

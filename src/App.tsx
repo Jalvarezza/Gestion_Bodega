@@ -13,6 +13,8 @@ import { NotasPage }        from './features/notas/pages/NotasPage'
 import { NotaDetallePage }  from './features/notas/pages/NotaDetallePage'
 import { SalidasPage }      from './features/salidas/pages/SalidasPage'
 import { HistorialPage }    from './features/historial/pages/HistorialPage'
+import { PickingMasivoPage }     from './features/picking-masivo/pages/PickingMasivoPage'
+import { OrdenPickingPage }      from './features/picking-masivo/pages/OrdenPickingPage'
 import { UsuariosPage }          from './features/usuarios/pages/UsuariosPage'
 
 function Protected({ children }: { children: React.ReactNode }) {
@@ -39,6 +41,8 @@ export default function App() {
       <Route path="/productos"   element={<Protected><ProductosPage /></Protected>} />
       <Route path="/notas"       element={<Protected><NotasPage /></Protected>} />
       <Route path="/notas/:id"   element={<Protected><NotaDetallePage /></Protected>} />
+      <Route path="/picking-masivo"     element={<Protected><PickingMasivoPage /></Protected>} />
+      <Route path="/picking-masivo/:id" element={<Protected><OrdenPickingPage /></Protected>} />
       <Route path="/historial"   element={<Protected><HistorialPage /></Protected>} />
 
       {/* Solo Admin */}
