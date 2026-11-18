@@ -1,9 +1,6 @@
--- ═══════════════════════════════════════════════════════════════════════════
--- WAVE PICKING — Imperial & Construmart
--- Tablas separadas del flujo Sodimac (sesiones_picking_masivo)
--- ═══════════════════════════════════════════════════════════════════════════
+--Imperial & Construmart
 
--- ── 1. Cabecera de la ola ────────────────────────────────────────────────────
+--1. Cabecera de la ola
 CREATE TABLE olas_picking (
   id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   proveedor           TEXT        NOT NULL CHECK (proveedor IN ('imperial', 'construmart')),
@@ -27,7 +24,7 @@ CREATE TABLE olas_picking (
   nombre_chofer       TEXT
 );
 
--- ── 2. Órdenes de compra dentro de la ola ───────────────────────────────────
+-- 2. Órdenes de compra dentro de la ola
 -- Un archivo puede contener N órdenes distintas (Núm. Orden / N° OC)
 CREATE TABLE ola_ordenes (
   id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -39,7 +36,7 @@ CREATE TABLE ola_ordenes (
 
 CREATE INDEX idx_ola_ordenes_ola ON ola_ordenes(ola_id);
 
--- ── 3. Líneas de la ola ──────────────────────────────────────────────────────
+-- 3. Líneas de la ola
 -- Cada fila del Excel = 1 línea.
 -- Un LPN puede repetirse si contiene múltiples productos (caso Construmart).
 -- Fase 2: operador escanea LPN → se marcan todas las líneas de ese LPN.
@@ -76,7 +73,7 @@ CREATE INDEX idx_ola_lineas_orden       ON ola_lineas(orden_id);
 CREATE INDEX idx_ola_lineas_lpn         ON ola_lineas(ola_id, lpn);
 CREATE INDEX idx_ola_lineas_producto    ON ola_lineas(producto_id) WHERE producto_id IS NOT NULL;
 
--- ── 4. Tareas de extracción consolidadas (Fase 1) ────────────────────────────
+--4. Tareas de extracción consolidadas (Fase 1)
 -- 1 tarea por SKU único en la ola.
 -- cantidad_total = suma de todas las líneas con ese código en toda la ola.
 -- ruta_sugerida  = posiciones FIFO calculadas al activar (solo orientación al operador).
@@ -114,10 +111,7 @@ CREATE INDEX idx_ola_tareas_estado      ON ola_tareas_extraccion(ola_id, estado)
 CREATE INDEX idx_ola_tareas_producto    ON ola_tareas_extraccion(producto_id) WHERE producto_id IS NOT NULL;
 
 
--- ═══════════════════════════════════════════════════════════════════════════
 -- TRIGGER: auto-avanzar estado de la ola
--- ═══════════════════════════════════════════════════════════════════════════
-
 -- Al completar todas las tareas de extracción → ola pasa a 'en_preparacion'
 CREATE OR REPLACE FUNCTION fn_avanzar_ola_desde_extraccion()
 RETURNS TRIGGER LANGUAGE plpgsql AS $$
@@ -178,9 +172,7 @@ AFTER UPDATE ON ola_lineas
 FOR EACH ROW EXECUTE FUNCTION fn_avanzar_ola_desde_preparacion();
 
 
--- ═══════════════════════════════════════════════════════════════════════════
 -- RLS (misma política que el resto del sistema)
--- ═══════════════════════════════════════════════════════════════════════════
 
 ALTER TABLE olas_picking          ENABLE ROW LEVEL SECURITY;
 ALTER TABLE ola_ordenes           ENABLE ROW LEVEL SECURITY;
