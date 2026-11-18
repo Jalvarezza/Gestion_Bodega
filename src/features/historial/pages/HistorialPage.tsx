@@ -1228,7 +1228,7 @@ type ErrorFiltro = { desde?: string; hasta?: string; rango?: string }
 export function HistorialPage() {
   const hoyIso = new Date().toISOString().slice(0, 10)
 
-  const [vista,               setVista]               = useState<'movimientos' | 'notas' | 'ingresos'>('movimientos')
+  const [vista,               setVista]               = useState<'movimientos' | 'notas'>('movimientos')
   const [filtros,             setFiltros]             = useState<ObtenerMovimientosInput | null>({ limite: LIMITE, offset: 0, desde: hoyIso, hasta: hoyIso })
   const [detalle,             setDetalle]             = useState<DetalleContexto>(null)
   const [tipoInput,           setTipoInput]           = useState('')
@@ -1343,15 +1343,6 @@ export function HistorialPage() {
               ),
             },
             {
-              key: 'ingresos',
-              label: 'IMP',
-              icon: (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" width={15} height={15}>
-                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="12" y1="8" x2="12" y2="13"/><line x1="9.5" y1="11" x2="12" y2="13.5"/><line x1="14.5" y1="11" x2="12" y2="13.5"/>
-                </svg>
-              ),
-            },
-            {
               key: 'notas',
               label: 'NV',
               icon: (
@@ -1376,8 +1367,6 @@ export function HistorialPage() {
           </button>
         ))}
       </div>
-
-      {vista === 'ingresos' && <IngresosHistorialView />}
 
       {vista === 'notas' && (
         <NotasHistorialView />

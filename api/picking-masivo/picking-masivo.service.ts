@@ -83,22 +83,43 @@ async function liberarLineasAbandonadas() {
     .lt('tomado_en', limite)
 }
 
-async function ubicacionesFifo(productoId: string): Promise<UbicacionPM[]> {
-  const { data } = await supabase
+const aUbicacion = (l: any): UbicacionPM => ({
+  loteId:         l.id,
+  posicionCodigo: l.posiciones_rack?.codigo ?? '',
+  cantidad:       l.cantidad,
+  fechaIngreso:   l.fecha_ingreso,
+})
+
+function consultaLotes() {
+  return supabase
     .from('lotes_inventario')
-    .select('id, cantidad, fecha_ingreso, posiciones_rack(codigo)')
-    .eq('producto_id', productoId)
+    .select('id, producto_id, cantidad, fecha_ingreso, posiciones_rack(codigo)')
     .eq('activo', true)
     .gt('cantidad', 0)
     .not('posicion_id', 'is', null)
     .order('fecha_ingreso', { ascending: true })
     .order('created_at', { ascending: true })
-  return (data ?? []).map((l: any) => ({
-    loteId:         l.id,
-    posicionCodigo: l.posiciones_rack?.codigo ?? '',
-    cantidad:       l.cantidad,
-    fechaIngreso:   l.fecha_ingreso,
-  }))
+}
+
+async function ubicacionesFifo(productoId: string): Promise<UbicacionPM[]> {
+  const { data } = await consultaLotes().eq('producto_id', productoId)
+  return (data ?? []).map(aUbicacion)
+}
+
+// Una consulta por bloque de productos en vez de una por línea: la OC puede traer cientos de líneas
+async function ubicacionesFifoPorProducto(productoIds: string[]): Promise<Map<string, UbicacionPM[]>> {
+  const unicos = [...new Set(productoIds)]
+  const bloques: string[][] = []
+  for (let i = 0; i < unicos.length; i += 60) bloques.push(unicos.slice(i, i + 60))
+  const resultados = await Promise.all(bloques.map((ids) => consultaLotes().in('producto_id', ids)))
+  const mapa = new Map<string, UbicacionPM[]>()
+  for (const { data } of resultados) {
+    for (const l of data ?? []) {
+      if (!mapa.has(l.producto_id)) mapa.set(l.producto_id, [])
+      mapa.get(l.producto_id).push(aUbicacion(l))
+    }
+  }
+  return mapa
 }
 
 // Recalcula el avance de la OC y la cierra cuando todas sus líneas quedan resueltas
@@ -292,7 +313,9 @@ export const pickingMasivoService = {
     if (error || !s) return { ok: false, error: { code: 'NOT_FOUND', message: 'Orden no encontrada' } }
 
     const items = (s.items_picking_masivo ?? []).sort((a, b) => a.codigo.localeCompare(b.codigo))
-    const lineas: LineaOrden[] = await Promise.all(items.map(async (i: any) => ({
+    const fifo = await ubicacionesFifoPorProducto(
+      items.filter((i: any) => !ESTADOS_RESUELTOS.includes(i.estado)).map((i: any) => i.producto_id))
+    const lineas: LineaOrden[] = items.map((i: any) => ({
       id:                     i.id,
       productoId:             i.producto_id,
       sku:                    i.codigo,
@@ -306,8 +329,8 @@ export const pickingMasivoService = {
       motivo:                 i.motivo_diferencia,
       tomadoPor:              i.tomado_por,
       tomadoPorNombre:        i.tomador?.nombre ?? null,
-      ubicaciones:            ESTADOS_RESUELTOS.includes(i.estado) ? [] : await ubicacionesFifo(i.producto_id),
-    })))
+      ubicaciones:            ESTADOS_RESUELTOS.includes(i.estado) ? [] : (fifo.get(i.producto_id) ?? []),
+    }))
 
     return {
       ok: true,
@@ -329,14 +352,13 @@ export const pickingMasivoService = {
 
   // Bloqueo atómico de una línea para un operador (un solo UPDATE condicionado)
   async tomarLinea(input: { usuarioId: string; itemId: string }): Promise<ServiceResult<{ itemId: string }>> {
-    if ((await rolDe(input.usuarioId)) !== 'operador') {
+    const [rol, { data: linea }] = await Promise.all([
+      rolDe(input.usuarioId),
+      supabase.from('items_picking_masivo').select('sesiones_picking_masivo(estado)').eq('id', input.itemId).single(),
+    ])
+    if (rol !== 'operador') {
       return { ok: false, error: { code: 'UNAUTHORIZED', message: 'Solo un operador puede hacer picking' } }
     }
-    const { data: linea } = await supabase
-      .from('items_picking_masivo')
-      .select('sesiones_picking_masivo(estado)')
-      .eq('id', input.itemId)
-      .single()
     if (!linea) return { ok: false, error: { code: 'NOT_FOUND', message: 'Línea no encontrada' } }
     if (linea.sesiones_picking_masivo?.estado !== 'activa') {
       return { ok: false, error: { code: 'CONFLICT_ESTADO_INVALIDO', message: 'La orden ya no está activa' } }

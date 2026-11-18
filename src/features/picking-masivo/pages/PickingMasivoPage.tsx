@@ -5,9 +5,14 @@ import { ImportarOCFlow } from '../components/ImportarOCFlow'
 
 type Filtro = 'todas' | 'activa' | 'completada'
 
-const ETIQUETA_ESTADO: Record<string, string> = { activa: 'En preparación', completada: 'Completada' }
+const ETIQUETA_ESTADO: Record<string, string> = { activa: 'En proceso', completada: 'Completada', cancelada: 'Cancelada' }
 
-const fecha = (iso: string | null) => (iso ? iso.slice(0, 10).split('-').reverse().join('-') : '—')
+const IcoOjo = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" />
+  </svg>
+)
+
 
 export function PickingMasivoPage() {
   const navigate  = useNavigate()
@@ -36,7 +41,7 @@ export function PickingMasivoPage() {
 
   const kpis: { clave: Filtro; label: string; valor: number }[] = [
     { clave: 'todas',      label: 'Todas',          valor: ordenes.length },
-    { clave: 'activa',     label: 'En preparación', valor: ordenes.filter((o) => o.estado === 'activa').length },
+    { clave: 'activa',     label: 'En proceso',     valor: ordenes.filter((o) => o.estado === 'activa').length },
     { clave: 'completada', label: 'Completadas',    valor: ordenes.filter((o) => o.estado === 'completada').length },
   ]
 
@@ -59,7 +64,7 @@ export function PickingMasivoPage() {
       </div>
 
       <div className="pmo-filtros">
-        <input className="pmo-buscar" placeholder="Buscar por OC o cliente…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+        <input className="pmo-buscar" placeholder="🔍 Buscar por cliente u OC…" value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
         <label className="pmo-fecha">
           <span>Fecha creación</span>
           <input type="date" value={dia} onChange={(e) => setDia(e.target.value)} />
@@ -76,46 +81,35 @@ export function PickingMasivoPage() {
       {visibles.length > 0 && (
         <div className="pmo-tabla-ordenes">
           <div className="pmo-fila pmo-fila--encabezado">
-            <span>Orden / Cliente</span>
-            <span>Avance</span>
-            <span>Creación</span>
+            <span>Cliente / OC</span>
             <span>Estado</span>
-            <span className="pmo-col-acciones">Acciones</span>
+            <span>Acciones</span>
           </div>
 
           {visibles.map((o) => {
             const pct = o.unidadesPedidas > 0 ? Math.round((o.unidadesPickeadas / o.unidadesPedidas) * 100) : 0
+            const hacerPicking = o.estado === 'activa' && rol === 'operador'
             return (
               <div key={o.id} className={`pmo-fila pmo-fila--${o.estado}`}>
                 <div className="pmo-col-orden">
-                  <span className="pmo-oc">OC {o.numeroOc}</span>
                   <span className="pmo-cliente">{o.nombreCliente ?? '—'}</span>
-                </div>
-
-                <div className="pmo-col-avance">
-                  <div className="pmo-avance-cabecera">
-                    <span>{o.lineasResueltas}/{o.totalLineas} líneas</span>
-                    <strong>{pct}%</strong>
+                  <span className="pmo-oc">OC {o.numeroOc}</span>
+                  <div className="pmo-avance">
+                    <div className="pmo-barra"><div className="pmo-barra-relleno" style={{ width: `${pct}%` }} /></div>
+                    <span>
+                      {o.lineasResueltas}/{o.totalLineas} líneas · {pct}%
+                      {o.estado === 'activa' && o.operadoresActivos > 0 && ` · ${o.operadoresActivos} trabajando`}
+                    </span>
                   </div>
-                  <div className="pmo-barra"><div className="pmo-barra-relleno" style={{ width: `${pct}%` }} /></div>
-                  <span className="pmo-sub">
-                    {o.unidadesPickeadas.toLocaleString('es-CL')} / {o.unidadesPedidas.toLocaleString('es-CL')} uds
-                    {o.estado === 'activa' && o.operadoresActivos > 0 && ` · ${o.operadoresActivos} trabajando`}
-                  </span>
                 </div>
 
-                <div className="pmo-col-creacion">
-                  <span>{fecha(o.creadoEn)}</span>
-                  <span className="pmo-sub">{o.creadoPorNombre ?? '—'}</span>
-                </div>
-
-                <div>
+                <div className="pmo-col-estado">
                   <span className={`pmo-badge pmo-badge--${o.estado}`}>{ETIQUETA_ESTADO[o.estado] ?? o.estado}</span>
                 </div>
 
                 <div className="pmo-col-acciones">
-                  <button className="pmo-btn-ver" onClick={() => navigate(`/picking-masivo/${o.id}`)}>
-                    {o.estado === 'activa' && rol === 'operador' ? 'Hacer picking' : 'Ver detalle'}
+                  <button className={`pmo-btn-ver ${hacerPicking ? 'pmo-btn-ver--picking' : ''}`} onClick={() => navigate(`/picking-masivo/${o.id}`)}>
+                    {hacerPicking ? 'Picking' : <><IcoOjo /> Ver</>}
                   </button>
                 </div>
               </div>

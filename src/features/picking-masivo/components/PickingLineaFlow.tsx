@@ -4,7 +4,8 @@ import { ApiResponseError } from '../../../shared/utils/apiClient'
 import { sonarEscaneoExitoso, sonarEscaneoError } from '../../../shared/utils/sonidos'
 import { onlyNumbersKeyDown, onlyNumbersPaste } from '../../../shared/utils/numericInput'
 import { useRegistrarPickingPM, useSinStockPM } from '../hooks/usePickingMasivo'
-import type { LineaOrden, UbicacionPM } from '../services/pickingMasivo.api'
+import type { LineaOrden } from '../services/pickingMasivo.api'
+import { calcularPlan, type Parada } from '../utils/planFifo'
 
 interface Props {
   linea:      LineaOrden
@@ -12,8 +13,6 @@ interface Props {
   onSalir:    () => void
   onTerminada: (ordenCompleta: boolean) => void
 }
-
-type Parada = UbicacionPM & { cantidadATomar: number }
 
 type Paso =
   | { tipo: 'rack';     idx: number }
@@ -23,18 +22,6 @@ type Paso =
   | { tipo: 'sin_stock' }
 
 const normBarra = (s: string | null | undefined) => (s ?? '').trim().replace(/^0+/, '')
-
-function calcularPlan(ubicaciones: UbicacionPM[], necesario: number): Parada[] {
-  const plan: Parada[] = []
-  let restante = necesario
-  for (const u of ubicaciones) {
-    if (restante <= 0) break
-    const tomar = Math.min(u.cantidad, restante)
-    plan.push({ ...u, cantidadATomar: tomar })
-    restante -= tomar
-  }
-  return plan
-}
 
 export function PickingLineaFlow({ linea, usuarioId, onSalir, onTerminada }: Props) {
   const pendiente = linea.cantidadPedida - linea.cantidadDespachada
@@ -148,10 +135,11 @@ export function PickingLineaFlow({ linea, usuarioId, onSalir, onTerminada }: Pro
         <button className="btn-cerrar" onClick={onSalir} aria-label="Salir">✕</button>
       </div>
 
-      <div className="picking-progreso">
-        <span className="pendiente-badge">Pendiente: <strong>{pendiente - tomado}</strong> de {linea.cantidadPedida}</span>
-        {plan.length > 1 && 'idx' in paso && <span className="multilote-badge">Parada {paso.idx + 1} de {plan.length}</span>}
-      </div>
+      {plan.length > 1 && 'idx' in paso && (
+        <div className="picking-progreso">
+          <span className="multilote-badge">Parada {paso.idx + 1} de {plan.length}</span>
+        </div>
+      )}
 
       {error && <div className="error-banner">{error}</div>}
 
@@ -160,7 +148,6 @@ export function PickingLineaFlow({ linea, usuarioId, onSalir, onTerminada }: Pro
           <div className="ubicacion-fifo fifo-actual">
             <span className="codigo-rack">Dirígete al rack {parada.posicionCodigo}</span>
             <span className="cantidad">Sacar {parada.cantidadATomar} uds</span>
-            <span className="fecha">Ingreso {parada.fechaIngreso.slice(0, 10).split('-').reverse().join('-')}</span>
           </div>
           <p className="paso-instruccion">Escanea el código del rack</p>
           <div className="input-con-camara">

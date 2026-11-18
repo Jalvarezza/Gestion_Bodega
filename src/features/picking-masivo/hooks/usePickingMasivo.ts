@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../../../lib/supabaseClient'
 import { pickingMasivoApi } from '../services/pickingMasivo.api'
+import type { OrdenDetalle } from '../services/pickingMasivo.api'
 
 const CLAVE = ['picking-masivo']
 
@@ -25,8 +26,24 @@ function useMutacionPM<TIn, TOut>(fn: (body: TIn) => Promise<TOut>) {
 }
 
 export const useCrearOrden        = () => useMutacionPM(pickingMasivoApi.crear)
-export const useTomarLinea        = () => useMutacionPM(pickingMasivoApi.tomarLinea)
-export const useLiberarLinea      = () => useMutacionPM(pickingMasivoApi.liberarLinea)
+function useCambioLineaPM(fn: (body: { usuarioId: string; itemId: string }) => Promise<{ itemId: string }>, tomar: boolean) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: fn,
+    onSuccess: (_r, { usuarioId, itemId }) => {
+      qc.setQueriesData<OrdenDetalle>({ queryKey: [...CLAVE, 'orden'] }, (orden) => orden && {
+        ...orden,
+        lineas: orden.lineas.map((l) => l.id !== itemId ? l : tomar
+          ? { ...l, estado: 'en_progreso', tomadoPor: usuarioId }
+          : { ...l, estado: 'libre', tomadoPor: null, tomadoPorNombre: null }),
+      })
+    },
+    onSettled: () => { qc.invalidateQueries({ queryKey: CLAVE }) },
+  })
+}
+
+export const useTomarLinea        = () => useCambioLineaPM(pickingMasivoApi.tomarLinea, true)
+export const useLiberarLinea      = () => useCambioLineaPM(pickingMasivoApi.liberarLinea, false)
 export const useRegistrarPickingPM = () => useMutacionPM(pickingMasivoApi.registrarPicking)
 export const useSinStockPM        = () => useMutacionPM(pickingMasivoApi.registrarSinStock)
 export const useCancelarOrden     = () => useMutacionPM(pickingMasivoApi.cancelar)
