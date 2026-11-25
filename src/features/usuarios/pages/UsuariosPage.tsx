@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { apiClient } from '../../../shared/utils/apiClient'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 type Usuario = { id: string; nombre: string; email: string; rol: string; bloqueado: boolean }
 type Rol = 'admin' | 'supervisor' | 'validador' | 'operador'
@@ -146,6 +147,7 @@ export function UsuariosPage() {
         <h1 className="notas-titulo">Usuarios</h1>
         <button className="btn-primario" onClick={() => setModalCrear(true)}>+ Nuevo usuario</button>
       </div>
+      <SubtituloModulo modulo="usuarios" />
 
       {isLoading && <p className="cargando">Cargando usuarios…</p>}
       {isError   && <p className="error">Error al cargar usuarios</p>}

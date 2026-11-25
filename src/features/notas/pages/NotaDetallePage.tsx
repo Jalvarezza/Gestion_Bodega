@@ -552,18 +552,6 @@ export function NotaDetallePage() {
   const pendientes  = productosMostrados.filter((p) => !esTerminado(p))
   const completados = productosMostrados.filter(esTerminado)
 
-  // ── PickingFlow ───────────────────────────────────────────────────────────
-  if (itemPicking) {
-    return (
-      <PickingFlow
-        item={itemPicking}
-        usuarioId={operadorId}
-        onCompletado={() => { setItemPicking(null); void refetch() }}
-        onCerrar={()     => { setItemPicking(null); void refetch() }}
-      />
-    )
-  }
-
   // ── Render fila de producto ───────────────────────────────────────────────
   function renderFila(item: NotaProductoResumen) {
     const terminado      = esTerminado(item)
@@ -912,6 +900,17 @@ export function NotaDetallePage() {
             Nota {data.estado === 'despachada' ? 'despachada' : 'lista para despacho'} —
             {' '}{itemsCompletos} de {totalItems} ítems completados
           </span>
+        </div>
+      )}
+
+      {itemPicking && (
+        <div className="modal-overlay pmo-modal" role="dialog" aria-modal="true">
+          <PickingFlow
+            item={itemPicking}
+            usuarioId={operadorId}
+            onCompletado={() => { setItemPicking(null); void refetch() }}
+            onCerrar={()     => { setItemPicking(null); void refetch() }}
+          />
         </div>
       )}
     </div>

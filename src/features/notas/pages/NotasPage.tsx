@@ -6,6 +6,7 @@ import { ApiResponseError } from '../../../shared/utils/apiClient'
 import { useConectividad } from '../../../shared/hooks/useConectividad'
 import { ImportarNotaFlow } from '../components/ImportarNotaFlow'
 import type { NotaResumen } from '../services/notas.api'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 const ESTADO_LABELS: Record<string, string> = {
   pendiente:   'Pendiente',
@@ -226,7 +227,10 @@ export function NotasPage() {
 
   return (
     <div className="notas-page">
-      <h1 className="notas-titulo">NV preparación</h1>
+      <div className="notas-encabezado">
+        <h1 className="notas-titulo">NV preparación</h1>
+        <SubtituloModulo modulo="notas" />
+      </div>
 
       {offline && <div className="aviso-offline">Sin conexión — modo solo lectura.</div>}
 
@@ -422,7 +426,7 @@ export function NotasPage() {
                       {nota.estado === 'completa'
                         ? (nota.completadaPor ?? nota.importadoPor ?? 'Sin asignar')
                         : nota.tomadaPor
-                          ? (bloqueada ? 'En preparación' : 'Asignado')
+                          ? (nota.tomadaPorNombre ?? (bloqueada ? 'En preparación' : 'Asignado'))
                           : 'Sin asignar'
                       }
                     </span>

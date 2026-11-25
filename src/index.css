@@ -13694,3 +13694,55 @@ input[type="radio"] {
 @media (max-width: 480px) {
   .pmo-modal { padding: 8px; align-items: flex-start; }
 }
+
+/* Nombre del usuario en la esquina superior derecha (todos los roles) */
+.layout-usuario {
+  display: flex;
+  justify-content: flex-end;
+  padding: var(--spacing-md) var(--spacing-md) 0;
+}
+.layout-usuario-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--text-on-accent);
+  font-weight: 700;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 14px rgba(0, 160, 223, 0.35);
+}
+.layout-usuario-chip svg { width: 18px; height: 18px; flex-shrink: 0; }
+.layout-usuario-nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 480px) {
+  .layout-usuario { padding: 10px 12px 0; }
+  .layout-usuario-chip { padding: 6px 14px; font-size: 0.85rem; }
+}
+
+/* Subtítulo descriptivo de NV Preparación y NV Despacho */
+.notas-encabezado { display: flex; flex-direction: column; gap: var(--spacing-md); }
+.notas-subtitulo {
+  margin: 0;
+  padding: 14px 22px;
+  border-left: 4px solid var(--accent);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-surface));
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+.mapa-encabezado { margin-bottom: var(--spacing-md); }
+.notas-subtitulo--espaciado { margin: var(--spacing-md) 0; }
+
+/* NV Despacho: pasos de revisión dentro de la ventana flotante */
+.rv-modal .rv-scan-paso { padding: 0; border: none; border-radius: 0; background: none; box-shadow: none; max-width: none; margin: 0; }
+
+/* Picking masivo: cliente desplegable con OC y fecha de entrega */
+.pmo-cliente-btn { display: inline-flex; align-items: center; gap: 8px; padding: 0; border: none; background: none; cursor: pointer; text-align: left; max-width: 100%; }
+.pmo-cliente-btn:hover .pmo-cliente { color: var(--accent); }
+.pmo-chevron { color: var(--text-secondary); font-size: 0.9rem; transition: transform .15s; }
+.pmo-chevron--abierto { transform: rotate(180deg); }
+.pmo-cliente-detalle { display: flex; flex-wrap: wrap; gap: 4px 28px; margin-top: 6px; font-size: 0.9rem; color: var(--text-secondary); }
+.pmo-cliente-detalle b { color: var(--text-primary); font-weight: 700; }

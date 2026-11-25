@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useOrdenesPicking, usePickingMasivoRealtime } from '../hooks/usePickingMasivo'
 import { ImportarOCFlow } from '../components/ImportarOCFlow'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 type Filtro = 'todas' | 'activa' | 'completada'
 
@@ -13,7 +14,6 @@ const IcoOjo = () => (
   </svg>
 )
 
-
 export function PickingMasivoPage() {
   const navigate  = useNavigate()
   const usuarioId = localStorage.getItem('user_id') ?? ''
@@ -24,7 +24,17 @@ export function PickingMasivoPage() {
   const [filtro, setFiltro]     = useState<Filtro>('todas')
   const [busqueda, setBusqueda] = useState('')
   const [dia, setDia]           = useState('')
+  const [abiertas, setAbiertas] = useState<Set<string>>(new Set())
   const { data: ordenes = [], isLoading, isError } = useOrdenesPicking()
+
+  function alternar(id: string) {
+    setAbiertas((prev) => {
+      const sig = new Set(prev)
+      if (sig.has(id)) sig.delete(id)
+      else sig.add(id)
+      return sig
+    })
+  }
   usePickingMasivoRealtime()
 
   const visibles = useMemo(() => {
@@ -53,6 +63,7 @@ export function PickingMasivoPage() {
           <button className="btn-primario pmo-btn-nueva" onClick={() => setImportar(true)}>+ Cargar OC</button>
         )}
       </header>
+      <SubtituloModulo modulo="pickingMasivo" />
 
       <div className="pmo-kpis">
         {kpis.map((k) => (
@@ -81,26 +92,26 @@ export function PickingMasivoPage() {
       {visibles.length > 0 && (
         <div className="pmo-tabla-ordenes">
           <div className="pmo-fila pmo-fila--encabezado">
-            <span>Cliente / OC</span>
+            <span>Cliente</span>
             <span>Estado</span>
             <span>Acciones</span>
           </div>
 
           {visibles.map((o) => {
-            const pct = o.unidadesPedidas > 0 ? Math.round((o.unidadesPickeadas / o.unidadesPedidas) * 100) : 0
             const hacerPicking = o.estado === 'activa' && rol === 'operador'
+            const abierta = abiertas.has(o.id)
             return (
               <div key={o.id} className={`pmo-fila pmo-fila--${o.estado}`}>
                 <div className="pmo-col-orden">
-                  <span className="pmo-cliente">{o.nombreCliente ?? '—'}</span>
-                  <span className="pmo-oc">OC {o.numeroOc}</span>
-                  <div className="pmo-avance">
-                    <div className="pmo-barra"><div className="pmo-barra-relleno" style={{ width: `${pct}%` }} /></div>
-                    <span>
-                      {o.lineasResueltas}/{o.totalLineas} líneas · {pct}%
-                      {o.estado === 'activa' && o.operadoresActivos > 0 && ` · ${o.operadoresActivos} trabajando`}
-                    </span>
-                  </div>
+                  <button className="pmo-cliente-btn" aria-expanded={abierta} onClick={() => alternar(o.id)}>
+                    <span className="pmo-cliente">{o.nombreCliente ?? '—'}</span>
+                    <span className={`pmo-chevron ${abierta ? 'pmo-chevron--abierto' : ''}`} aria-hidden="true">▾</span>
+                  </button>
+                  {abierta && (
+                    <div className="pmo-cliente-detalle">
+                      <span><b>OC:</b> {o.numeroOc}</span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="pmo-col-estado">

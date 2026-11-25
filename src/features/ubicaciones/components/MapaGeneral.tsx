@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { PasilloMapa, RackMapa } from '../hooks/useUbicaciones'
 import { RACKS_LAYOUT, PASILLOS_LAYOUT, FRANJAS_PASILLO, BODEGA_VIEWBOX, LIMITE_PASILLOS_CHICOS, LIMITE_PASILLOS_CHICOS_TOPE, ZONA_VACIA_CHICA, MAPA_CONTENIDO } from '../config/racksLayout'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 type EstadoFiltro = 'ninguno' | 'disponibles' | 'busqueda'
 
@@ -50,8 +51,10 @@ export function MapaGeneral({
 
   return (
     <>
-      <h1 className="mapa-titulo">Mapa de Bodega</h1>
-      <p className="mapa-subtitulo">Toca un rack para ver su detalle</p>
+      <div className="notas-encabezado mapa-encabezado">
+        <h1 className="mapa-titulo">Mapa de Bodega</h1>
+        <SubtituloModulo modulo="mapa" />
+      </div>
 
       <div className="mapa-filtro-estado">
         <button

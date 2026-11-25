@@ -548,10 +548,10 @@ export function RevisionFlow({
 
       {/* ── Avisos ── */}
       {offline && <div className="nd-aviso nd-aviso--offline">Sin conexión — modo solo lectura.</div>}
-      {error   && <div className="nd-aviso nd-aviso--error">{error}</div>}
+      {error && paso.tipo === 'lista' && <div className="nd-aviso nd-aviso--error">{error}</div>}
 
       {/* ── Botón Anular NV (solo admin, solo en vista lista, no despachada) ── */}
-      {paso.tipo === 'lista' && esAdmin && !yaDespachada && (
+      {esAdmin && !yaDespachada && (
         <div style={{ padding: '0 var(--spacing-md)', marginBottom: '0.5rem' }}>
           <button
             className="rv-btn-anular"
@@ -594,7 +594,7 @@ export function RevisionFlow({
       )}
 
       {/* ── Progreso global (solo en vista lista) ── */}
-      {paso.tipo === 'lista' && (
+      {(
         <div className="nd-progreso-global">
           <div className="nd-progreso-info">
             <span className="nd-progreso-titulo">Revisión de productos</span>
@@ -610,7 +610,7 @@ export function RevisionFlow({
       )}
 
       {/* ══ VISTA LISTA ════════════════════════════════════════════════════ */}
-      {paso.tipo === 'lista' && (
+      {(
         <>
           {comentarioDespacho && (
             <div className="nd-aviso" style={{ borderColor: 'var(--color-blue-500)', background: 'color-mix(in srgb, var(--color-blue-500) 10%, transparent)' }}>
@@ -648,6 +648,24 @@ export function RevisionFlow({
           )}
         </>
       )}
+
+      {paso.tipo !== 'lista' && (
+        <div className="modal-overlay pmo-modal" role="dialog" aria-modal="true">
+          <div className="picking-flow rv-modal">
+            <div className="picking-header">
+              <div>
+                <h3>{'item' in paso ? (paso.item.skuEquivalente ?? paso.item.sku) : 'Revisión'}</h3>
+                {'item' in paso && <p className="picking-nombre">{paso.item.nombre}</p>}
+              </div>
+              <button
+                className="btn-cerrar"
+                aria-label="Cerrar"
+                onClick={() => { setPaso({ tipo: 'lista' }); setError(null); setScanError(''); setScanInput('') }}
+              >
+                ✕
+              </button>
+            </div>
+            {error && <div className="error-banner">{error}</div>}
 
       {/* ══ ESCANEAR PRODUCTO ══════════════════════════════════════════════ */}
       {paso.tipo === 'escanear_producto' && (
@@ -787,7 +805,7 @@ export function RevisionFlow({
               className="nd-btn-enviar"
               style={{ width: '100%', justifyContent: 'center', marginTop: '0.5rem' }}
               disabled={offline}
-              onClick={() => setMostrarModalChofer(true)}
+              onClick={() => { setPaso({ tipo: 'lista' }); setMostrarModalChofer(true) }}
             >
               <IcoTruck size={14} /> Lista para despacho
             </button>
@@ -795,6 +813,9 @@ export function RevisionFlow({
           <button className="btn-secundario" style={{ marginTop: '0.5rem' }} onClick={() => { setPaso({ tipo: 'lista' }); setError(null) }}>
             ← Volver a la lista
           </button>
+        </div>
+      )}
+          </div>
         </div>
       )}
     </div>

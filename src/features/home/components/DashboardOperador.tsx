@@ -1,4 +1,5 @@
 import { useDashboard, useEquipoBodega } from '../hooks/useDashboard'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 // ── Datos reales — flujo de trabajo ──────────────────────────────────────────
 // Los estados de notas_venta se mapean directamente desde los KPIs del dashboard.
@@ -70,6 +71,7 @@ export function DashboardOperador() {
           <span className="tc-bienvenida-nombre">{nombreUsuario}</span>
         </h1>
       </div>
+      <SubtituloModulo modulo="inicioOperador" espaciado />
 
       {/* ── KPIs producción ─────────────────────────────────────────────────── */}
       <div className="tc-kpi-inline">

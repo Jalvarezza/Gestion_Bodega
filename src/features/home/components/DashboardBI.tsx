@@ -3,6 +3,7 @@ import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDashboard, useDespachosSemana, useDespachosDia, useKpisBi } from '../hooks/useDashboard'
 import type { DiaDespacho } from '../hooks/useDashboard'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 // ── Error boundary ────────────────────────────────────────────────────────
 
@@ -149,6 +150,7 @@ function DashboardBIInner() {
           <p className="bi-subtitulo">Bodega Central Grantt — {mesActual}</p>
         </div>
       </div>
+      <SubtituloModulo modulo="dashboard" espaciado />
 
       {/* KPIs */}
       <div className="bi-kpi-op-row">

@@ -123,6 +123,10 @@ const IconMoon = () => (
   </svg>
 )
 
+const ROL_LABEL: Record<string, string> = {
+  admin: 'Administrador', supervisor: 'Supervisor', validador: 'Validador', operador: 'Operador',
+}
+
 interface Props { children: React.ReactNode }
 
 export function Layout({ children }: Props) {
@@ -332,6 +336,14 @@ export function Layout({ children }: Props) {
         {offline && (
           <div className="offline-banner bg-[rgba(239,68,68,0.15)] border-b border-[rgba(239,68,68,0.3)] text-red-300 text-sm text-center py-2 px-4">
             Sin conexión — modo solo lectura
+          </div>
+        )}
+        {nombre && (
+          <div className="layout-usuario">
+            <span className="layout-usuario-chip" title={rol ? ROL_LABEL[rol] : undefined}>
+              <IconUser />
+              <span className="layout-usuario-nombre">{nombre}</span>
+            </span>
           </div>
         )}
         <main className="layout-main flex-1">

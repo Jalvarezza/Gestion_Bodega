@@ -3,6 +3,7 @@ import { useBuscarProductos, useUbicacionesProducto } from '../hooks/useProducto
 import { useConectividad } from '../../../shared/hooks/useConectividad'
 import { BarcodeScanner } from '../../../shared/components/BarcodeScanner'
 import type { ProductoConUbicacion } from '../../../shared/types/servicios'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 function BadgeUbicacion({ tipo, label }: { tipo: ProductoConUbicacion['ubicacion']['tipo']; label: string }) {
   return (
@@ -149,6 +150,7 @@ export function ProductosPage() {
         <UbicacionesModal p={productoSeleccionado} onCerrar={() => setProductoSeleccionado(null)} />
       )}
       <h1 className="productos-titulo">Búsqueda de Productos</h1>
+      <SubtituloModulo modulo="busqueda" espaciado />
 
       {offline && <div className="aviso-offline">Sin conexión — datos en caché</div>}
 

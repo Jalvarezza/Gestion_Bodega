@@ -7,6 +7,7 @@ import { DevolucionFlow } from '../components/DevolucionFlow'
 import { useConectividad } from '../../../shared/hooks/useConectividad'
 import type { NotaParaRevision } from '../services/salidas.api'
 import type { ItemRevision } from '../components/RevisionFlow'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 type Vista =
   | { tipo: 'lista' }
@@ -249,7 +250,10 @@ export function SalidasPage() {
 
   return (
     <div className="notas-page">
-      <h1 className="notas-titulo">NV Despacho</h1>
+      <div className="notas-encabezado">
+        <h1 className="notas-titulo">NV Despacho</h1>
+        <SubtituloModulo modulo="despacho" />
+      </div>
 
       {offline && <div className="aviso-offline">Sin conexión — modo solo lectura.</div>}
 

@@ -5,6 +5,7 @@ import { TIPOS_MOVIMIENTO, TIPO_LABELS } from '../services/historial.api'
 import type { MovimientoHistorial, ObtenerMovimientosInput, OCResumen, ProductoEnOC } from '../services/historial.api'
 import { useNotas } from '../../notas/hooks/useNotas'
 import type { NotaResumen } from '../../notas/services/notas.api'
+import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
 const LIMITE = 50
 
@@ -1329,6 +1330,7 @@ export function HistorialPage() {
 
   return (
     <div className="historial-page">
+      <SubtituloModulo modulo="historial" espaciado />
       {/* ── Tabs ── */}
       <div className="flex gap-1 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-2xl p-1 mb-4 w-full tablet:w-fit overflow-hidden">
         {(
