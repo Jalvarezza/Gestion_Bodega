@@ -1,7 +1,7 @@
 import { useState, Component } from 'react'
 import type { ReactNode } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useDashboard, useDespachosSemana, useDespachosDia, useKpisBi } from '../hooks/useDashboard'
+import { useDashboard, useDespachosSemana, useDespachosDia, useKpisBi, useDashboardRealtime } from '../hooks/useDashboard'
 import type { DiaDespacho } from '../hooks/useDashboard'
 import { SubtituloModulo } from '../../../shared/components/SubtituloModulo'
 
@@ -106,6 +106,7 @@ function DashboardBIInner() {
 
   const { data: kpis, isLoading: kpisLoading } = useDashboard()
   const { data: semanaData } = useDespachosSemana()
+  useDashboardRealtime()
   const { data: notasDia, isLoading: cargandoDia } = useDespachosDia(diaSeleccionado)
   const { data: biData } = useKpisBi()
 

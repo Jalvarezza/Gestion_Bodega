@@ -1,4 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useEffect } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { supabase } from '../../../lib/supabaseClient'
 import { apiClient } from '../../../shared/utils/apiClient'
 import { dashboardApi, type FiltrosDespachosMensuales } from '../services/dashboard.api'
 export type { DespachosSemana, DiaDespacho, KpisBi, TurnoStats, ActividadItem, OperadorStats, EquipoBodega } from '../services/dashboard.api'
@@ -70,4 +72,18 @@ export function useEquipoBodega() {
     staleTime:      0,
     refetchInterval: 30_000,  // refresca cada 30s para ver cambios de estado
   })
+}
+
+// Actualiza KPIs, gráfico de despachos y actividad apenas cambia una nota (despacho, completada, nueva NV…)
+export function useDashboardRealtime() {
+  const qc = useQueryClient()
+  useEffect(() => {
+    const canal = supabase
+      .channel('dashboard:notas')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notas_venta' }, () => {
+        qc.invalidateQueries({ queryKey: ['dashboard'] })
+      })
+      .subscribe()
+    return () => { supabase.removeChannel(canal) }
+  }, [qc])
 }

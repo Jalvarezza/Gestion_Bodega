@@ -27,6 +27,7 @@ export function useRegistrarPicking() {
       qc.invalidateQueries({ queryKey: ['ubicaciones'], exact: false })
       // Puede completar la nota y hacerla aparecer en la lista de despacho
       qc.invalidateQueries({ queryKey: ['salidas'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })
 }
@@ -38,6 +39,7 @@ export function useRegistrarSinStock() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notas'] })
       qc.invalidateQueries({ queryKey: ['salidas'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })
 }
@@ -49,6 +51,7 @@ export function useConcluirParcial() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notas'] })
       qc.invalidateQueries({ queryKey: ['salidas'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })
 }
@@ -70,6 +73,7 @@ export function useEnviarARevision() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notas'] })
       qc.invalidateQueries({ queryKey: ['salidas'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })
 }
@@ -82,6 +86,7 @@ export function useCambiarEstadoNota() {
       qc.invalidateQueries({ queryKey: ['notas'] })
       // Al pasar a despachada, la nota debe salir de la lista "NV para despacho"
       qc.invalidateQueries({ queryKey: ['salidas'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })
 }
@@ -113,6 +118,7 @@ export function useAnularNota() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notas'] })
       qc.invalidateQueries({ queryKey: ['salidas'] })
+      qc.invalidateQueries({ queryKey: ['dashboard'] })
     },
   })
 }
