@@ -34,7 +34,7 @@ const SUBTITULOS = {
     operador: 'Órdenes de picking masivo activas asignadas a tu turno. Únete a una sesión para comenzar a preparar los productos solicitados.',
   },
   despacho: para(CONTROL, 'Revisa cada producto de cada nota de venta por escaneo, asigna el chofer y despacha.'),
-  historial: para(CONTROL, 'Registro de todos los movimientos de la bodega: quién hizo cada acción, cuándo y sobre qué producto o nota de venta.'),
+  historial: para(['admin'], 'Registro de todos los movimientos de la bodega: quién hizo cada acción, cuándo y sobre qué producto o nota de venta.'),
   usuarios: { admin: 'Crea usuarios, asigna su rol, cambia contraseñas y bloquea o elimina accesos.' },
 } satisfies Record<string, Textos>
 

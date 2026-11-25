@@ -3,9 +3,9 @@ import { Navigate } from 'react-router-dom'
 import type { UserRole } from '../types/base'
 
 // Rutas que solo puede ver admin
-const RUTAS_SOLO_ADMIN = ['/usuarios']
+const RUTAS_SOLO_ADMIN = ['/usuarios', '/historial']
 // Rutas bloqueadas para el operador
-const RUTAS_ADMIN_SUPERVISOR = ['/salidas', '/historial']
+const RUTAS_ADMIN_SUPERVISOR = ['/salidas']
 
 interface Props {
   children:   React.ReactNode

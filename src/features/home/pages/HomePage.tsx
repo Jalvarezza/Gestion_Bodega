@@ -46,7 +46,7 @@ const NAV_ITEMS: NavItem[] = [
   { ruta: '/ubicaciones',             key: 'ubicaciones', label: 'Mapa Bodega',    desc: 'Ver estructura de bodega' },
   { ruta: '/notas',                   key: 'notas',       label: 'NV preparacion', desc: 'Picking y despacho' },
   { ruta: '/salidas',                 key: 'salidas',     label: 'NV despacho',    desc: 'Revisión antes de despacho',     roles: ['admin', 'supervisor', 'validador'] },
-  { ruta: '/historial',               key: 'historial',   label: 'Historial',      desc: 'Auditoría de movimientos',       roles: ['admin', 'supervisor', 'validador'] },
+  { ruta: '/historial',               key: 'historial',   label: 'Historial',      desc: 'Auditoría de movimientos',       roles: ['admin'] },
 ]
 
 // ── KPI card ──────────────────────────────────────────────────────────────

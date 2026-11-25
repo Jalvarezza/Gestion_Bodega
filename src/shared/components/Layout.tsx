@@ -40,10 +40,10 @@ const IcoReporte  = <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" s
 // ─────────────────────────────────────────────────────────────────────────────
 //  MATRIZ DE NAVEGACIÓN POR ROL
 //
-//  admin:      todo (incluye Usuarios)
-//  supervisor: igual que admin, excepto Usuarios
+//  admin:      todo (incluye Usuarios e Historial)
+//  supervisor: igual que admin, excepto Usuarios e Historial
 //  (Picking masivo: admin y supervisor cargan OC; operador hace el picking)
-//  validador:  Dashboard BI, Busqueda, Mapa, NV Despacho, Historial
+//  validador:  Dashboard BI, Busqueda, Mapa, NV Despacho
 //  operador:   Busqueda, Mapa, NV Preparación, Picking masivo
 // ─────────────────────────────────────────────────────────────────────────────
 const NAV_ITEMS: NavItem[] = [
@@ -78,7 +78,7 @@ const NAV_ITEMS: NavItem[] = [
   },
   // ── Admin + Supervisor + Validador ───────────────────────────────────────
   {
-    ruta: '/historial', label: 'Historial', labelCorto: 'Historial', roles: ['admin', 'supervisor', 'validador'],
+    ruta: '/historial', label: 'Historial', labelCorto: 'Historial', roles: ['admin'],
     icono: IcoHistoria,
   },
   // ── Solo Admin ───────────────────────────────────────────────────────────
