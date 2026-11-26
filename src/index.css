@@ -13746,3 +13746,6 @@ input[type="radio"] {
 .pmo-chevron--abierto { transform: rotate(180deg); }
 .pmo-cliente-detalle { display: flex; flex-wrap: wrap; gap: 4px 28px; margin-top: 6px; font-size: 0.9rem; color: var(--text-secondary); }
 .pmo-cliente-detalle b { color: var(--text-primary); font-weight: 700; }
+/* Rol del usuario bajo la cápsula con su nombre */
+.layout-usuario-bloque { display: flex; flex-direction: column; align-items: center; gap: 6px; max-width: 100%; }
+.layout-usuario-rol { font-size: 0.8rem; font-weight: 700; letter-spacing: .04em; color: var(--accent); }

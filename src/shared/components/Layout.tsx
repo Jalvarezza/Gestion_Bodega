@@ -340,10 +340,13 @@ export function Layout({ children }: Props) {
         )}
         {nombre && (
           <div className="layout-usuario">
-            <span className="layout-usuario-chip" title={rol ? ROL_LABEL[rol] : undefined}>
-              <IconUser />
-              <span className="layout-usuario-nombre">{nombre}</span>
-            </span>
+            <div className="layout-usuario-bloque">
+              <span className="layout-usuario-chip" title={rol ? ROL_LABEL[rol] : undefined}>
+                <IconUser />
+                <span className="layout-usuario-nombre">{nombre}</span>
+              </span>
+              {rol && <span className="layout-usuario-rol">{ROL_LABEL[rol]}</span>}
+            </div>
           </div>
         )}
         <main className="layout-main flex-1">
